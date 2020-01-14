@@ -8,12 +8,13 @@
 
 USAGE_STRING="Usage: bash $0 [pink] [brown] [laplace] [uniform] [exponential]"
 OUTPUT_FILE="../data.txt"
-SAMPLE_LENGTH=1000
-if [ -z "$1" ]; then echo $USAGE_STRING && exit 0; else pink_count=$1; fi
-if [ -z "$2" ]; then brown_count=0; else brown_count=$2; fi
-if [ -z "$3" ]; then laplace_count=0; else laplace_count=$3; fi
-if [ -z "$4" ]; then uniform_count=0; else uniform_count=$4; fi
-if [ -z "$5" ]; then exponential_count=0; else exponential_count=$5; fi
+
+if [ -z "$1" ]; then echo $USAGE_STRING && exit 0; else SAMPLE_LENGTH=$1; fi
+if [ -z "$2" ]; then pink_count=0; else pink_count=$2; fi
+if [ -z "$3" ]; then brown_count=0; else brown_count=$3; fi
+if [ -z "$4" ]; then laplace_count=0; else laplace_count=$4; fi
+if [ -z "$5" ]; then uniform_count=0; else uniform_count=$5; fi
+if [ -z "$6" ]; then exponential_count=0; else exponential_count=$6; fi
 
 # $1: the command to execute
 # $2: the label for the command
