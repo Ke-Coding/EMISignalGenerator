@@ -31,7 +31,7 @@ function execute() {
 echo 'Compiling signal generators with gcc...'
 mkdir build 2>/dev/null
 cd build
-cmakenew ../src
+cmake ../src
 make
 cd ../dist
 
