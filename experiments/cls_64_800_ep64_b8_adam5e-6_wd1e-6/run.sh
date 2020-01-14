@@ -21,11 +21,11 @@ else
   echo "data file already exists."
 fi
 
+PYTHONPATH=${PYTHONPATH}:../../ python -u -m cls_solver \
 srun \
 --job-name ${PWD##*/} \
 --mpi=pmi2 -p $1 -n1 --gres=gpu:2 \
 --ntasks-per-node=2 \
-PYTHONPATH=${PYTHONPATH}:../../ python -u -m cls_solver \
 --log_dir=cls \
 --input_size=${SIG_LEN} \
 --num_classes=5 \
