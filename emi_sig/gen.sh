@@ -6,8 +6,9 @@
 # 4 -> uniformrv
 # 5 -> exponentialrv
 
-USAGE_STRING="Usage: bash $0 [pink] [brown] [laplace] [uniform] [exponential]"
-OUTPUT_FILE="../data.txt"
+USAGE_STRING="Usage: bash $0 [length] [pink] [brown] [laplace] [uniform] [exponential] [fout]"
+# OUTPUT_FILE="../data.txt"
+OUTPUT_FILE=$7
 
 if [ -z "$1" ]; then echo $USAGE_STRING && exit 0; else SAMPLE_LENGTH=$1; fi
 if [ -z "$2" ]; then pink_count=0; else pink_count=$2; fi

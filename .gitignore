@@ -1,2 +1,5 @@
-build/*
-dist/*
+emi_sig/build/*
+emi_sig/dist/*
+events*.*
+*.txt
+*.pth.tar
