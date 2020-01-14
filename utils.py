@@ -137,8 +137,8 @@ def set_seed(seed):
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
-    torch.backends.cudnn.benchmark = False      # todo 为什么？
-    torch.backends.cudnn.deterministic = True   # todo 为什么？
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
 
 
 def create_logger(name, log_file, level=logging.INFO, stream=True):
