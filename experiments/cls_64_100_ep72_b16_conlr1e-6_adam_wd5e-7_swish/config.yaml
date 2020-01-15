@@ -28,5 +28,5 @@ optm:
     kwargs:
 #        nesterov: True
 #        momentum: 0.9
-        betas: (0.5, 0.999)
+        betas: !!python/tuple [0.5, 0.999]
         weight_decay: 0.0000005
