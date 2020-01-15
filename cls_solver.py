@@ -247,9 +247,10 @@ def main():
     #         [summary_tb_lg.add_scalars('avg_mean_best_accs', {'baseline': baseline}, t) for t in [0, args.loops / 2, args.loops - 1]]
 
     # scheduler = build_sche(optimizer, start_epoch=0)
-    tot_time, best_acc = 0, 0
-    train_loss_avg = AverageMeter(cfg.tb_lg_freq)
-    train_acc_avg = AverageMeter(cfg.tb_lg_freq)
+    start_train_t = time.time()
+    best_acc = 0
+    train_loss_avg = AverageMeter(32 * cfg.tb_lg_freq)
+    train_acc_avg = AverageMeter(32 * cfg.tb_lg_freq)
     speed_avg = AverageMeter(0)
     for epoch in range(cfg.epochs):
         scheduler.step()
@@ -324,7 +325,7 @@ def main():
     if rank == 0:
         lg.info(
             f'==> End training,'
-            f' total time cost: {tot_time:.3f},'
+            f' total time cost: {time.time() - start_train_t:.3f},'
             f' best test acc: {best_acc:.3f}'
         )
         tb_lg.close()

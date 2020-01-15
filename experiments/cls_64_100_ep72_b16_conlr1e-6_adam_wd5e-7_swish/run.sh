@@ -2,11 +2,11 @@ EXP_DIR=$(pwd)
 PRO_DIR=$(dirname $(dirname "$PWD"))
 
 SIG_LEN=64
-SIG_N1=100
-SIG_N2=100
-SIG_N3=100
-SIG_N4=100
-SIG_N5=100
+SIG_N1=800
+SIG_N2=800
+SIG_N3=800
+SIG_N4=800
+SIG_N5=800
 
 DS_DIR="${PRO_DIR}/emi_sig"
 DS_FILE="${DS_DIR}/datasets/data_${SIG_LEN}_${SIG_N1}_${SIG_N2}_${SIG_N3}_${SIG_N4}_${SIG_N5}.txt"

@@ -9,7 +9,7 @@ save_many: False
 model:
     name: FCNet
     kwargs:
-        hid_dims: [128, 72, 48, 32]
+        hid_dims: [256, 192, 128, 72]
         dropout_p: 0.2
         af_name: swish
 
