@@ -14,6 +14,7 @@ from models import *
 from optimizer import AdamW
 from loss import LabelSmoothCELoss
 from emi_dataset import EMIDataset
+from scheduler import CosineLRScheduler, ConstScheduler
 from utils import create_exp_dir, create_logger, set_seed, param_group_all, init_params, AverageMeter
 
 
@@ -24,6 +25,7 @@ parser.add_argument('--num_classes', required=True, type=int)
 parser.add_argument('--epochs', default=100, type=int)
 parser.add_argument('--batch_size', default=16, type=int)
 parser.add_argument('--optm', default='adam', type=str)
+parser.add_argument('--sche', default='con', type=str)
 parser.add_argument('--af_name', default='relu', type=str)
 parser.add_argument('--lr', default=0.1, type=float)
 parser.add_argument('--wd', default=0.0001, type=float)
@@ -34,6 +36,8 @@ parser.add_argument('--val_freq', default=64, type=int)
 parser.add_argument('--data_path', default='', type=str)
 parser.add_argument('--save_many', action='store_true', default=False)
 
+parser.add_argument('--only_plt', action='store_true', default=False)
+parser.add_argument('--only_val', action='store_true', default=False)
 parser.add_argument('--seed', default=0, type=int)
 parser.add_argument('--lb_smooth', default=0.1, type=float)
 parser.add_argument('--grad_clip', default=5, type=float)
@@ -59,6 +63,8 @@ time_ascii_tensor = torch.from_numpy(np.array([ord(c) for c in run_time]))
 # link.broadcast(time_ascii_tensor, 0)
 sync_run_time = ''.join([chr(c.item()) for c in time_ascii_tensor])
 
+args.base_lr = args.lr / 4
+args.min_lr = args.lr / 100
 args.exp_time = sync_run_time
 args.log_dir = f'{args.log_dir}-{args.exp_time}'
 args.save_dir = os.path.join(args.log_dir, f'total_ckpt')
@@ -192,25 +198,25 @@ def build_op(net):
     return op
 
 
-# def build_sche(optimizer, start_epoch):
-#     global args
-#
-#     if args.sche == 'cos':
-#         return CosineLRScheduler(
-#             optimizer=optimizer,
-#             T_max=args.epochs,
-#             eta_min=args.learning_rate_min,
-#             base_lr=args.base_lr,
-#             warmup_lr=args.lr,
-#             warmup_steps=max(round(args.epochs * 0.04), 1),
-#             last_iter=start_epoch - 1
-#         )
-#     elif args.sche == 'con':
-#         return ConstScheduler(
-#             lr=args.lr
-#         )
-#     else:
-#         raise AttributeError(f'unknown scheduler type: {args.sche}')
+def build_sche(optimizer, start_epoch, T_max):
+    global args
+
+    if args.sche == 'cos':
+        return CosineLRScheduler(
+            optimizer=optimizer,
+            T_max=T_max,
+            eta_min=args.min_lr,
+            base_lr=args.base_lr,
+            warmup_lr=args.lr,
+            warmup_steps=max(round(args.epochs * 0.04), 1),
+            last_iter=start_epoch - 1
+        )
+    elif args.sche == 'con':
+        return ConstScheduler(
+            lr=args.lr
+        )
+    else:
+        raise AttributeError(f'unknown scheduler type: {args.sche}')
 
 
 def main():
@@ -219,6 +225,7 @@ def main():
     # Initialize.
     net: torch.nn.Module = build_model()
     optimizer = build_op(net)
+    scheduler = build_sche(optimizer, start_epoch=0, T_max=args.epochs * len(train_loader))
     
     # if args.resume_path:
     #     if rank == 0:
@@ -243,7 +250,7 @@ def main():
     train_acc_avg = AverageMeter(args.tb_lg_freq)
     speed_avg = AverageMeter(0)
     for epoch in range(args.epochs):
-        # scheduler.step()
+        scheduler.step()
         
         # train a epoch
         tot_it = len(train_loader)
@@ -270,7 +277,7 @@ def main():
             if (it % args.tb_lg_freq == 0 or it == tot_it - 1) and rank == 0:
                 tb_lg.add_scalar('train_loss', train_loss_avg.avg, it + tot_it * epoch)
                 tb_lg.add_scalar('train_acc', train_acc_avg.avg, it + tot_it * epoch)
-                # tb_lg.add_scalar('lr', scheduler.get_lr()[0], it + tot_it * epoch)
+                tb_lg.add_scalar('lr', scheduler.get_lr()[0], it + tot_it * epoch)
 
             if it % args.val_freq == 0 or it == tot_it - 1:
                 test_loss, test_acc = test(net)
@@ -331,5 +338,15 @@ def main():
     # link.finalize()
 
 
+def plt_data():
+    global test_set, lg
+    
+
+
 if __name__ == '__main__':
-    main()
+    if args.only_plt:
+        plt_data()
+    elif args.only_val:
+        pass
+    else:
+        main()

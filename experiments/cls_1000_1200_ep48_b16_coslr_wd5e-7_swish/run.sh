@@ -1,14 +1,14 @@
 EXP_DIR=$(pwd)
-SIG_LEN=64
-SIG_N=800
+SIG_LEN=1000
+SIG_N=1200
 
 EP=48
-BS=8
-OP=adam
-SCHE=con
-AF=relu
-LR=0.000005
-WD=0.000001
+BS=16
+OP=sgd
+SCHE=cos
+AF=swish
+LR=0.000001
+WD=0.0000005
 DROP=0.2
 
 DATA_DIR="${EXP_DIR}/data_${SIG_LEN}_${SIG_N}.txt"

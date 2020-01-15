@@ -5,6 +5,7 @@ SIG_N=1200
 EP=48
 BS=16
 OP=adam
+SCHE=con
 AF=swish
 LR=0.000001
 WD=0.0000005
