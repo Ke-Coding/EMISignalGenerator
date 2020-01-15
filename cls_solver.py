@@ -249,9 +249,11 @@ def main():
     # scheduler = build_sche(optimizer, start_epoch=0)
     start_train_t = time.time()
     best_acc = 0
-    train_loss_avg = AverageMeter(32 * cfg.tb_lg_freq)
-    train_acc_avg = AverageMeter(32 * cfg.tb_lg_freq)
+    train_loss_avg = AverageMeter(cfg.tb_lg_freq)
+    train_acc_avg = AverageMeter(cfg.tb_lg_freq)
     speed_avg = AverageMeter(0)
+    test_loss_avg = AverageMeter(4 * cfg.val_freq)
+    test_acc_avg = AverageMeter(4 * cfg.val_freq)
     for epoch in range(cfg.epochs):
         scheduler.step()
         
@@ -284,6 +286,8 @@ def main():
 
             if it % cfg.val_freq == 0 or it == tot_it - 1:
                 test_loss, test_acc = test(net)
+                test_loss_avg.update(test_loss)
+                test_acc_avg.update(test_acc)
                 net.train()
                 if rank == 0:
                     remain_secs = (tot_it - it - 1) * speed_avg.avg + tot_it * (cfg.epochs - epoch - 1) * speed_avg.avg
@@ -293,8 +297,8 @@ def main():
                         f'ep[{epoch}/{cfg.epochs}], it[{it + 1}/{tot_it}]:'
                         f' t-acc[{train_acc_avg.val:.3f}] ({train_acc_avg.avg:.3f}),'
                         f' t-loss[{train_loss_avg.val:.4f}] ({train_loss_avg.avg:.4f}),'
-                        f' v-acc[{test_acc:.3f}],'
-                        f' v-loss[{test_loss:.4f}]'
+                        f' v-acc[{test_acc_avg.val:.3f}] ({test_acc_avg.avg:.3f}),'
+                        f' v-loss[{test_loss_avg.val:.4f}] ({test_loss_avg.avg:.4f}),'
                         f' data[{data_t - last_t:.3f}], train[{train_t - data_t:.3f}]'
                         f' rem-t[{remain_time}] ({finish_time})'
                     )
