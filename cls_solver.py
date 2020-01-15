@@ -254,7 +254,7 @@ def main():
     
             optimizer.zero_grad()
             if rank == 0:
-                lg.info(f'==> inputs: {type(inputs)}, {tuple(inputs.size)}')
+                lg.info(f'==> inputs: {type(inputs)}, {tuple(inputs.shape)}')
             outputs = net(inputs)
             # outputs = outputs[0]
             loss = criterion(outputs, targets)
