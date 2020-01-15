@@ -108,9 +108,9 @@ test_set = EMIDataset(
 if rank == 0:
     lg.info(f'==> Getting dataloader from {args.data_path} ...')
 train_loader = DataLoader(
-    dataset=train_set, batch_size=args.batch_size, shuffle=True, num_workers=2, pin_memory=False)
+    dataset=train_set, batch_size=args.batch_size, shuffle=True, num_workers=2, pin_memory=True)
 test_loader = DataLoader(
-    dataset=test_set, batch_size=args.batch_size, shuffle=False, num_workers=2, pin_memory=False)
+    dataset=test_set, batch_size=args.batch_size, shuffle=False, num_workers=2, pin_memory=True)
 
 classes = ('pink', 'brown', 'laplace', 'uniform', 'exponential')
 assert args.num_classes == len(classes)
@@ -247,8 +247,11 @@ def main():
         
         # train a epoch
         tot_it = len(train_loader)
+        lg.info(f'tot_it:{tot_it}')
         last_t = time.time()
         for it, (inputs, targets) in enumerate(train_loader):
+            lg.info(f'inputs({inputs.shape}): {inputs}')
+            lg.info(f'targets({targets.shape}): {targets}')
             data_t = time.time()
             if using_gpu:
                 inputs, targets = inputs.cuda(), targets.cuda()
