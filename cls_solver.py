@@ -39,6 +39,7 @@ rank = 0
 #     global_rank=rank, world_size=world_size,
 #     num_groups=args.num_groups, group_size=args.group_size)
 
+
 # Parsing args
 args = parser.parse_args()
 args.save_dir = os.path.join(args.log_dir, f'ckpts')
@@ -61,11 +62,6 @@ cfg.optm.sche = cfg.optm.sche.strip().lower()
 cfg.optm.base_lr = cfg.optm.lr if cfg.optm.sche == 'con' else cfg.optm.lr / 4
 cfg.optm.min_lr = cfg.optm.lr / 100.
 
-if rank == 0:
-    print(f'==> Final config: {cfg}')
-
-
-rank = 0
 
 if rank == 0:
     print('==> Creating dirs ...')
@@ -79,6 +75,7 @@ if rank == 0:
     lg = create_logger('global', os.path.join(args.log_dir, 'log.txt'))
     print('==> Creating logger complete.\n')
     lg.info(f'==> Final args: {args}\n')
+    lg.info(f'==> Final cfg: {cfg}\n')
     tb_lg = SummaryWriter(os.path.join(args.log_dir, 'events'))
     tb_lg.add_text('exp_time', time.strftime("%Y%m%d-%H%M%S"))
     tb_lg.add_text('exp_dir', f'~/{os.path.relpath(os.getcwd(), os.path.expanduser("~"))}')
