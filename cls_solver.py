@@ -247,11 +247,8 @@ def main():
         
         # train a epoch
         tot_it = len(train_loader)
-        lg.info(f'tot_it:{tot_it}')
         last_t = time.time()
         for it, (inputs, targets) in enumerate(train_loader):
-            lg.info(f'inputs({inputs.shape}): {inputs}')
-            lg.info(f'targets({targets.shape}): {targets}')
             data_t = time.time()
             if using_gpu:
                 inputs, targets = inputs.cuda(), targets.cuda()
