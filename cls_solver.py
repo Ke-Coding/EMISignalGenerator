@@ -210,7 +210,7 @@ def build_sche(optimizer, start_epoch, T_max):
             eta_min=cfg.optm.min_lr,
             base_lr=cfg.optm.base_lr,
             warmup_lr=cfg.optm.lr,
-            warmup_steps=max(round(cfg.epochs * 0.04), 1),
+            warmup_steps=max(round(T_max * 0.04), 1),
             last_iter=start_epoch - 1
         )
     elif cfg.optm.sche == 'con':

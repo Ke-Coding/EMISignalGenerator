@@ -14,9 +14,9 @@ model:
         af_name: swish
 
 optm:
-    name: sgd
-    sche: cos
-    lr: 0.000001
+    name: adamw
+    sche: con
+    lr: 0.0000001
 
     nowd: True
     nowd_dict:
@@ -26,7 +26,7 @@ optm:
             weight_decay: 0.0
 
     kwargs:
-        nesterov: True
-        momentum: 0.9
-#        betas: !!python/tuple [0.5, 0.999]
-        weight_decay: 0.0000005
+#        nesterov: True
+#        momentum: 0.9
+        betas: !!python/tuple [0.5, 0.999]
+        weight_decay: 0.00000005
