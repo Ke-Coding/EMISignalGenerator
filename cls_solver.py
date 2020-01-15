@@ -106,6 +106,7 @@ test_set = EMIDataset(
 
 if rank == 0:
     lg.info(f'==> Getting dataloader from {args.data_path} ...')
+    lg.info(f'ds len:{len(train_set)}')
 train_loader = DataLoader(
     dataset=train_set, batch_size=args.batch_size, shuffle=True, num_workers=2, pin_memory=True)
 test_loader = DataLoader(
@@ -249,12 +250,17 @@ def main():
         last_t = time.time()
         for it, (inputs, targets) in enumerate(train_loader):
             data_t = time.time()
-            if using_gpu:
-                inputs, targets = inputs.cuda(), targets.cuda()
-    
-            optimizer.zero_grad()
             if rank == 0:
                 lg.info(f'==> inputs: {type(inputs)}, {tuple(inputs.shape)}')
+                lg.info(f'==> targets: {type(targets)}, {tuple(targets.shape)}')
+            if using_gpu:
+                inputs, targets = inputs.cuda(), targets.cuda()
+                if rank == 0:
+                    lg.info(f'==> gpu inputs: {type(inputs)}, {tuple(inputs.shape)}')
+                    lg.info(f'==> gpu targets: {type(targets)}, {tuple(targets.shape)}')
+    
+            optimizer.zero_grad()
+            
             outputs = net(inputs)
             # outputs = outputs[0]
             loss = criterion(outputs, targets)
