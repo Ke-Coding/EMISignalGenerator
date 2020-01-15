@@ -3,13 +3,14 @@ from __future__ import division
 
 import argparse
 import datetime
-import numpy as np
 import os
 import time
 import torch
+import yaml
+
+from easydict import EasyDict
 from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
-import yaml
 
 from models import *
 from optimizer import AdamW
@@ -47,6 +48,7 @@ if rank == 0:
 cfg = None
 with open(args.cfg_dir) as f:
     cfg = yaml.load(f, Loader=yaml.FullLoader) if hasattr(yaml, 'FullLoader') else yaml.load(f)
+    cfg = EasyDict(cfg)
 
 if rank == 0:
     print(f'==> Raw config: {cfg}')
