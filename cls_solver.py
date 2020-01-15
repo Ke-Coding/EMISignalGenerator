@@ -165,7 +165,7 @@ def build_model():
         lg.info('==> Building model..')
     net: torch.nn.Module = {
         'FCNet': FCNet,
-    }[cfg.model.name](*cfg.model.kwargs)
+    }[cfg.model.name](**cfg.model.kwargs)
     init_params(net)
     
     if loaded_ckpt is not None:
@@ -197,7 +197,7 @@ def build_op(net):
         'sgd': torch.optim.SGD,
         'adam': torch.optim.Adam,
         'adamw': AdamW,
-    }[cfg.optm.name](*cfg.optm.kwargs)
+    }[cfg.optm.name](**cfg.optm.kwargs)
     if loaded_ckpt is not None:
         op.load_state_dict(loaded_ckpt['optimizer'])
     return op
