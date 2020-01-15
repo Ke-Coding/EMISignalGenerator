@@ -1,5 +1,4 @@
 import torch
-import linklink as link
 from bisect import bisect_right
 import math
 
