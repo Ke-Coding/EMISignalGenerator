@@ -157,7 +157,6 @@ def build_model():
     global args, resumed_checkpoint, lg
     if rank == 0:
         lg.info('==> Building model..')
-    lg.info(args.input_size)
     net: torch.nn.Module = FCNet(input_dim=args.input_size, output_dim=args.num_classes,
                                  hid_dims=[256, 192, 128, 72], dropout_p=args.dropout_p,
                                  af_name='swish')
@@ -255,7 +254,7 @@ def main():
     
             optimizer.zero_grad()
             if rank == 0:
-                lg.info('==> inputs: ', type(inputs), inputs.size)
+                lg.info(f'==> inputs: {type(inputs)}, {tuple(inputs.size)}')
             outputs = net(inputs)
             # outputs = outputs[0]
             loss = criterion(outputs, targets)
