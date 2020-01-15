@@ -230,7 +230,7 @@ def main():
     # Initialize.
     net: torch.nn.Module = build_model()
     optimizer = build_op(net)
-    scheduler = build_sche(optimizer, start_epoch=0, T_max=args.epochs * len(train_loader))
+    scheduler = build_sche(optimizer, start_epoch=0, T_max=cfg.epochs * len(train_loader))
     
     # if args.resume_path:
     #     if rank == 0:
