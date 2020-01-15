@@ -15,7 +15,7 @@ DS_FILE="${DS_DIR}/datasets/data_${SIG_LEN}_${SIG_N1}_${SIG_N2}_${SIG_N3}_${SIG_
 if [[ ! -f ${DS_FILE} ]]; then
   echo "generate data..."
   cd ${DS_DIR}
-  sh gen.sh ${SIG_LEN} ${SIG_N1} ${SIG_N2} ${SIG_N3} ${SIG_N4} ${SIG_N5} ${DATA_DIR}
+  sh gen.sh ${SIG_LEN} ${SIG_N1} ${SIG_N2} ${SIG_N3} ${SIG_N4} ${SIG_N5} ${DS_FILE}
   cd ${EXP_DIR}
   echo "complete."
 else
