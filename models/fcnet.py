@@ -56,8 +56,9 @@ class FCNet(nn.Module):
         input(images) ==[view]==> flatten inputs ==[batchnorm0]==> normalized flatten inputs
         ==[backbone]==> features ==[dropout]==> sparse features ==[classifier]==> output(logits)
         """
+        print(type(x), x.size)
         flatten_x = x.view(x.size(0), -1)  # x.size(0): batch size(the number of images in each mini-batch)
-        # flatten_x = self.bn0(flatten_x) # todo: 为什么bn0有bug？
+        flatten_x = self.bn0(flatten_x)
         features = self.backbone(flatten_x)
         if self.using_dropout:
             features = self.dropout(features)

@@ -240,7 +240,7 @@ def main():
     tot_time, best_acc = 0, 0
     train_loss_avg = AverageMeter(args.tb_lg_freq)
     train_acc_avg = AverageMeter(args.tb_lg_freq)
-    speed_avg = AverageMeter(args.val_freq)
+    speed_avg = AverageMeter(0)
     for epoch in range(args.epochs):
         # scheduler.step()
         
@@ -264,7 +264,7 @@ def main():
     
             _, predicted = outputs.max(1)
             pred, correct = targets.size(0), predicted.eq(targets).sum().item() # targets.size(0) i.e. batch_size(or tail batch size)
-            train_acc_avg.update(val=correct / pred, num=pred / args.batch_size)
+            train_acc_avg.update(val=100. * correct / pred, num=pred / args.batch_size)
             
             if (it % args.tb_lg_freq == 0 or it == tot_it - 1) and rank == 0:
                 tb_lg.add_scalar('train_loss', train_loss_avg.avg, epoch)

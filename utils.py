@@ -69,7 +69,7 @@ def init_params(net):
             nn.init.kaiming_normal_(m.weight, mode='fan_out')
             if m.bias is not None:
                 nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.BatchNorm2d): # or SyncBatchNorm2d
+        elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d): # or SyncBatchNorm2d
             nn.init.constant_(m.weight, 1)
             nn.init.constant_(m.bias, 0)
         elif isinstance(m, nn.Linear):
