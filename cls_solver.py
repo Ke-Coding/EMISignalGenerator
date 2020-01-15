@@ -117,7 +117,7 @@ test_loader = DataLoader(
     dataset=test_set, batch_size=cfg.batch_size, shuffle=False, num_workers=2, pin_memory=True)
 
 classes = ('pink', 'brown', 'laplace', 'uniform', 'exponential')
-assert cfg.models.kwargs.num_classes == len(classes)
+assert cfg.model.kwargs.num_classes == len(classes)
 if rank == 0:
     lg.info(f'==> Preparing data complete, classes:{classes} .\n')
 
