@@ -24,6 +24,7 @@ parser.add_argument('--num_classes', required=True, type=int)
 parser.add_argument('--epochs', default=100, type=int)
 parser.add_argument('--batch_size', default=16, type=int)
 parser.add_argument('--optm', default='adam', type=str)
+parser.add_argument('--af_name', default='relu', type=str)
 parser.add_argument('--lr', default=0.1, type=float)
 parser.add_argument('--wd', default=0.0001, type=float)
 parser.add_argument('--nowd', action='store_true', default=False)
@@ -158,8 +159,8 @@ def build_model():
     if rank == 0:
         lg.info('==> Building model..')
     net: torch.nn.Module = FCNet(input_dim=args.input_size, output_dim=args.num_classes,
-                                 hid_dims=[256, 192, 128, 72], dropout_p=args.dropout_p,
-                                 af_name='swish')
+                                 hid_dims=[192, 144, 72, 64], dropout_p=args.dropout_p,
+                                 af_name=args.af_name)
     init_params(net)
     
     # if args.resume_path:
@@ -267,9 +268,9 @@ def main():
             train_acc_avg.update(val=100. * correct / pred, num=pred / args.batch_size)
             
             if (it % args.tb_lg_freq == 0 or it == tot_it - 1) and rank == 0:
-                tb_lg.add_scalar('train_loss', train_loss_avg.avg, epoch)
-                tb_lg.add_scalar('train_acc', train_acc_avg.avg, epoch)
-                # tb_lg.add_scalar('lr', scheduler.get_lr()[0], epoch)
+                tb_lg.add_scalar('train_loss', train_loss_avg.avg, it + tot_it * epoch)
+                tb_lg.add_scalar('train_acc', train_acc_avg.avg, it + tot_it * epoch)
+                # tb_lg.add_scalar('lr', scheduler.get_lr()[0], it + tot_it * epoch)
 
             if it % args.val_freq == 0 or it == tot_it - 1:
                 test_loss, test_acc = test(net)
@@ -287,8 +288,8 @@ def main():
                         f' data[{data_t - last_t:.3f}], train[{train_t - data_t:.3f}]'
                         f' rem-t[{remain_time}] ({finish_time})'
                     )
-                    tb_lg.add_scalar('test_loss', test_loss, epoch)
-                    tb_lg.add_scalar('test_acc', test_acc, epoch)
+                    tb_lg.add_scalar('test_loss', test_loss, it + tot_it * epoch)
+                    tb_lg.add_scalar('test_acc', test_acc, it + tot_it * epoch)
 
                 is_best = test_acc > best_acc
                 best_acc = max(test_acc, best_acc)

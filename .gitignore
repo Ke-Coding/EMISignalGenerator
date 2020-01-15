@@ -1,5 +1,6 @@
 emi_sig/build/*
 emi_sig/dist/*
+__pycache__
 events*.*
 *.txt
 *.pth.tar
