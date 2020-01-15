@@ -1,5 +1,5 @@
-epochs: 20
-batch_size: 4
+epochs: 72
+batch_size: 8
 label_smooth: 0.1
 grad_clip: 4.0
 tb_lg_freq: 8
@@ -14,8 +14,8 @@ model:
         af_name: swish
 
 optm:
-    name: SGD
-    sche: cos
+    name: adam
+    sche: con
     lr: 0.000001
 
     nowd: True
@@ -26,7 +26,7 @@ optm:
             weight_decay: 0.0
 
     kwargs:
-        nesterov: True
-        momentum: 0.9
-#        betas: (0.5, 0.999)
+#        nesterov: True
+#        momentum: 0.9
+        betas: (0.5, 0.999)
         weight_decay: 0.0000005

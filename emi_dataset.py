@@ -47,4 +47,3 @@ if __name__ == '__main__':
         normalize=True
     )
     print(test_set[0])
-
