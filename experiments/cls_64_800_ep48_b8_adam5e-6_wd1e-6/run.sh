@@ -15,7 +15,7 @@ DATA_DIR="${EXP_DIR}/data_${SIG_LEN}_${SIG_N}.txt"
 if [ ! -f ${DATA_DIR} ]; then
   echo "generate data..."
   cd ../../emi_sig
-  bash gen.sh $SIG_LEN ${SIG_N} ${SIG_N} ${SIG_N} ${SIG_N} ${SIG_N} ${DATA_DIR}
+  sh gen.sh $SIG_LEN ${SIG_N} ${SIG_N} ${SIG_N} ${SIG_N} ${SIG_N} ${DATA_DIR}
   cd ${EXP_DIR}
   echo "complete."
 else
