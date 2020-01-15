@@ -1,6 +1,5 @@
 EXP_DIR=$(pwd)
 SIG_LEN=64
-SIG_N=800
 
 EP=48
 BS=8
@@ -11,12 +10,12 @@ LR=0.000005
 WD=0.000001
 DROP=0.2
 
-DATA_DIR="${EXP_DIR}/data_${SIG_LEN}_${SIG_N}.txt"
+DATA_DIR="${EXP_DIR}/data_${SIG_LEN}.txt"
 
 if [ ! -f ${DATA_DIR} ]; then
   echo "generate data..."
   cd ../../emi_sig
-  bash gen_local.sh $SIG_LEN ${SIG_N} ${SIG_N} ${SIG_N} ${SIG_N} ${SIG_N} ${DATA_DIR}
+  bash gen_local.sh $SIG_LEN 1200 1200 1200 1200 1200 ${DATA_DIR}
   cd ${EXP_DIR}
   echo "complete."
 else
