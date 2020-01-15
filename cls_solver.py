@@ -45,7 +45,7 @@ if rank == 0:
     print(f'==> Args: {args}')
 
 cfg = None
-with open(args.config) as f:
+with open(args.cfg_dir) as f:
     cfg = yaml.load(f, Loader=yaml.FullLoader) if hasattr(yaml, 'FullLoader') else yaml.load(f)
 
 if rank == 0:

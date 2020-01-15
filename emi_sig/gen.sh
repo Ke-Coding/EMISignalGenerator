@@ -35,6 +35,8 @@ cd build
 make
 cd ../dist
 
+echo "output file is at: $OUTPUT_FILE"
+
 rm "$OUTPUT_FILE" 2>/dev/null
 
 echo "Generating $pink_count sample(s) with pinkgen..."
