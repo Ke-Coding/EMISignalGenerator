@@ -105,9 +105,9 @@ if rank == 0:
     lg.info(f'==> Reading dataset from {args.data_dir} ...')
 
 train_set = EMIDataset(
-    data_dir=args.data_dir, train=True, num_classes=cfg.models.kwargs.num_classes, normalize=True)
+    data_dir=args.data_dir, train=True, num_classes=cfg.model.kwargs.num_classes, normalize=True)
 test_set = EMIDataset(
-    data_dir=args.data_dir, train=False, num_classes=cfg.models.kwargs.num_classes, normalize=True)
+    data_dir=args.data_dir, train=False, num_classes=cfg.model.kwargs.num_classes, normalize=True)
 
 if rank == 0:
     lg.info(f'==> Getting dataloader from {args.data_dir} ...')
@@ -134,7 +134,7 @@ if args.load_dir is not None:
 
 # Get criterion.
 if cfg.get('lb_smooth', 0) > 0:
-    criterion = LabelSmoothCELoss(cfg.lb_smooth, cfg.models.kwargs.input_size)
+    criterion = LabelSmoothCELoss(cfg.lb_smooth, cfg.model.kwargs.input_size)
 else:
     criterion = torch.nn.CrossEntropyLoss()
 
