@@ -4,15 +4,15 @@ from bisect import bisect_right
 import math
 
 
-# def get_scheduler(config):
-#     config = EasyDict(config)
+# def get_scheduler(cfg):
+#     cfg = EasyDict(cfg)
 
-#     if config.type == 'STEP':
-#         return StepLRScheduler(config.optimizer, config.lr_steps, config.lr_mults, config.base_lr, config.warmup_lr, config.warmup_steps, last_iter=config.last_iter)
-#     elif config.type == 'COSINE':
-#         return CosineLRScheduler(config.optimizer, config.max_iter, config.min_lr, config.base_lr, config.warmup_lr, config.warmup_steps, last_iter=config.last_iter)
+#     if cfg.type == 'STEP':
+#         return StepLRScheduler(cfg.optimizer, cfg.lr_steps, cfg.lr_mults, cfg.base_lr, cfg.warmup_lr, cfg.warmup_steps, last_iter=cfg.last_iter)
+#     elif cfg.type == 'COSINE':
+#         return CosineLRScheduler(cfg.optimizer, cfg.max_iter, cfg.min_lr, cfg.base_lr, cfg.warmup_lr, cfg.warmup_steps, last_iter=cfg.last_iter)
 #     else:
-#         raise RuntimeError('unknown lr_scheduler type: {}'.format(config.type))
+#         raise RuntimeError('unknown lr_scheduler type: {}'.format(cfg.type))
 
 
 class _LRScheduler(object):

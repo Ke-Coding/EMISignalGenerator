@@ -1,0 +1,32 @@
+epochs: 20
+batch_size: 4
+label_smooth: 0.1
+grad_clip: 4.0
+tb_lg_freq: 8
+val_freq: 16
+save_many: False
+
+model:
+    name: FCNet
+    kwargs:
+        hid_dims: [128, 72, 48, 32]
+        dropout_p: 0.2
+        af_name: swish
+
+optm:
+    name: SGD
+    sche: cos
+    lr: 0.000001
+
+    nowd: True
+    nowd_dict:
+        bn_b:
+            weight_decay: 0.0
+        bn_w:
+            weight_decay: 0.0
+
+    kwargs:
+        nesterov: True
+        momentum: 0.9
+#        betas: (0.5, 0.999)
+        weight_decay: 0.0000005

@@ -1,26 +1,27 @@
 EXP_DIR=$(pwd)
-SIG_LEN=1000
+PRO_DIR=$(dirname $(dirname "$PWD"))
 
-EP=48
-BS=16
-OP=sgd
-SCHE=cos
-AF=swish
-LR=0.000001
-WD=0.0000005
-DROP=0.2
+SIG_LEN=64
+SIG_N1=60
+SIG_N2=60
+SIG_N3=60
+SIG_N4=60
+SIG_N5=60
 
-DATA_DIR="${EXP_DIR}/data_${SIG_LEN}.txt"
+DS_DIR="${PRO_DIR}/emi_sig/datasets"
+DS_FILE="${DS_DIR}/data_${SIG_LEN}_${SIG_N1}_${SIG_N2}_${SIG_N3}_${SIG_N4}_${SIG_N5}.txt"
 
-if [ ! -f ${DATA_DIR} ]; then
+
+if [[ ! -f ${DS_FILE} ]]; then
   echo "generate data..."
-  cd ../../emi_sig
-  sh gen.sh $SIG_LEN 1200 1200 1200 1200 1200 ${DATA_DIR}
+  cd ${DS_DIR}
+  sh gen.sh ${SIG_LEN} ${SIG_N1} ${SIG_N2} ${SIG_N3} ${SIG_N4} ${SIG_N5} ${DATA_DIR}
   cd ${EXP_DIR}
   echo "complete."
 else
   echo "data file already exists."
 fi
+
 
 PYTHONPATH=${PYTHONPATH}:../../ \
 srun \
@@ -29,18 +30,11 @@ srun \
 --ntasks-per-node=2 \
 --cpus-per-task=5 \
 python -u -m cls_solver \
---log_dir=cls \
+--cfg_dir=config.yaml \
+--log_dir=$(date +cls_%Y%m%d_%H_%M_%S) \
+--data_dir=${DS_FILE} \
+--num_gpu=1 \
+--seed=0 \
 --input_size=${SIG_LEN} \
 --num_classes=5 \
---epochs=${EP} \
---batch_size=${BS} \
---optm=${OP} \
---sche=${SCHE} \
---af_name=${AF} \
---lr=${LR} \
---wd=${WD} \
---nowd \
---dropout_p=${DROP} \
---tb_lg_freq=8 \
---val_freq=16 \
---data_path=${DATA_DIR} \
+#--load_dir= \

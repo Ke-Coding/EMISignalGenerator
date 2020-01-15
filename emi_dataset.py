@@ -5,8 +5,8 @@ from torch.utils.data import Dataset
 
 
 class EMIDataset(Dataset):
-    def __init__(self, fpath: str, train: bool, num_classes: int, normalize: bool):
-        whole_set = pd.read_csv(fpath, sep='\s+', header=None).values.astype(dtype=np.float32)
+    def __init__(self, data_dir: str, train: bool, num_classes: int, normalize: bool):
+        whole_set = pd.read_csv(data_dir, sep='\s+', header=None).values.astype(dtype=np.float32)
         data = {i: [] for i in range(num_classes)}
         [data[l[-1] - 1].append(l) for l in whole_set]
 
@@ -34,14 +34,14 @@ class EMIDataset(Dataset):
 
 if __name__ == '__main__':
     train_set = EMIDataset(
-        fpath='emi_sig/data.txt',
+        data_dir='emi_sig/data.txt',
         train=True,
         num_classes=5,
         normalize=True
     )
     print(train_set[0])
     test_set = EMIDataset(
-        fpath='emi_sig/data.txt',
+        data_dir='emi_sig/data.txt',
         train=False,
         num_classes=5,
         normalize=True

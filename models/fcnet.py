@@ -21,34 +21,34 @@ class FCBlock(nn.Module):
 
 
 class FCNet(nn.Module):
-    def __init__(self, input_dim, output_dim,
+    def __init__(self, input_size, num_classes,
                  hid_dims=[128, 72, 48, 32],
                  dropout_p=None,
                  af_name='relu'
                  ):
         r"""
-        :param input_dim(int): input dimention
-        :param output_dim(int): output dimention
-        :param hid_dims(List[int]): hidden layers' dimentions
+        :param input_size(int): input dimension
+        :param num_classes(int): output dimension
+        :param hid_dims(List[int]): hidden layers' dimension
             - len(hid_dims): the number of the hidden layers
         """
         super(FCNet, self).__init__()
-        self.input_dim, self.output_dim = input_dim, output_dim
+        self.input_dim, self.output_dim = input_size, num_classes
         self.hid_dims = hid_dims
         self.using_dropout = dropout_p is not None and abs(dropout_p) > 1e-6
         
         self.af = get_af(af_name=af_name)
         
-        self.bn0 = nn.BatchNorm1d(input_dim)  # this layer has a huge influence on acc
+        self.bn0 = nn.BatchNorm1d(input_size)  # this layer has a huge influence on acc
         self.backbone = self._make_backbone(
             len(hid_dims),
-            [input_dim] + hid_dims[:-1],
+            [input_size] + hid_dims[:-1],
             hid_dims
         )
         if self.using_dropout:
             self.dropout_p = dropout_p
             self.dropout = nn.Dropout(p=dropout_p)
-        self.classifier = nn.Linear(hid_dims[-1], output_dim, bias=True)
+        self.classifier = nn.Linear(hid_dims[-1], num_classes, bias=True)
     
     def forward(self, x):
         """
@@ -74,6 +74,6 @@ class FCNet(nn.Module):
 
 
 if __name__ == '__main__':  # testing
-    net: FCNet = FCNet(input_dim=64, output_dim=5, dropout_p=0.2)
+    net: FCNet = FCNet(input_size=64, num_classes=5, dropout_p=0.2)
     torchsummary.summary(net, (1, 64))
     net(tc.rand((2, 1, 64), dtype=tc.float32))
