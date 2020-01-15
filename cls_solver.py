@@ -33,6 +33,10 @@ parser.add_argument('--only_val', action='store_true', default=False)
 
 
 rank = 0
+# rank, world_size = dist_init()
+# local_rank, __, self_group_name, leader_group_name = group_split(
+#     global_rank=rank, world_size=world_size,
+#     num_groups=args.num_groups, group_size=args.group_size)
 
 # Parsing args
 args = parser.parse_args()
@@ -58,11 +62,6 @@ cfg.optm.min_lr = cfg.optm.lr / 100.
 if rank == 0:
     print(f'==> Final config: {cfg}')
 
-
-# rank, world_size = dist_init()
-# local_rank, __, self_group_name, leader_group_name = group_split(
-#     global_rank=rank, world_size=world_size,
-#     num_groups=args.num_groups, group_size=args.group_size)
 
 rank = 0
 
