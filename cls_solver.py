@@ -105,9 +105,9 @@ if rank == 0:
     lg.info(f'==> Reading dataset from {args.data_dir} ...')
 
 train_set = EMIDataset(
-    data_dir=args.data_dir, train=True, num_classes=cfg.num_classes, normalize=True)
+    data_dir=args.data_dir, train=True, num_classes=cfg.models.kwargs.num_classes, normalize=True)
 test_set = EMIDataset(
-    data_dir=args.data_dir, train=False, num_classes=cfg.num_classes, normalize=True)
+    data_dir=args.data_dir, train=False, num_classes=cfg.models.kwargs.num_classes, normalize=True)
 
 if rank == 0:
     lg.info(f'==> Getting dataloader from {args.data_dir} ...')
