@@ -32,6 +32,8 @@ parser.add_argument('--only_plt', action='store_true', default=False)
 parser.add_argument('--only_val', action='store_true', default=False)
 
 
+rank = 0
+
 # Parsing args
 args = parser.parse_args()
 args.save_dir = os.path.join(args.log_dir, f'ckpts')
