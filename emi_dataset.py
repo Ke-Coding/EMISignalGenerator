@@ -12,7 +12,7 @@ class EMIDataset(Dataset):
 
         picked = []
         for i in range(num_classes):
-            train_n = round(0.75 * len(data[i]))
+            train_n = round(0.8 * len(data[i]))
             test_n = len(data[i]) - train_n
             picked.extend(data[i][:train_n] if train else data[i][-test_n:])
         picked = np.vstack(picked)
