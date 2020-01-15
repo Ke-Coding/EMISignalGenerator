@@ -255,13 +255,13 @@ def main():
     test_loss_avg = AverageMeter(4 * cfg.val_freq)
     test_acc_avg = AverageMeter(4 * cfg.val_freq)
     for epoch in range(cfg.epochs):
-        scheduler.step()
         
         # train a epoch
         tot_it = len(train_loader)
         last_t = time.time()
         for it, (inputs, targets) in enumerate(train_loader):
             data_t = time.time()
+            scheduler.step()
             if using_gpu:
                 inputs, targets = inputs.cuda(), targets.cuda()
     
@@ -300,6 +300,7 @@ def main():
                         f' v-acc[{test_acc_avg.val:.3f}] ({test_acc_avg.avg:.3f}),'
                         f' v-loss[{test_loss_avg.val:.4f}] ({test_loss_avg.avg:.4f}),'
                         f' data[{data_t - last_t:.3f}], train[{train_t - data_t:.3f}]'
+                        f' lr[{scheduler.get_lr()[0]:.4g}]'
                         f' rem-t[{remain_time}] ({finish_time})'
                     )
                     tb_lg.add_scalar('test_loss', test_loss, it + tot_it * epoch)
