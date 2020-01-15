@@ -8,8 +8,8 @@ SIG_N3=60
 SIG_N4=60
 SIG_N5=60
 
-DS_DIR="${PRO_DIR}/emi_sig/datasets"
-DS_FILE="${DS_DIR}/data_${SIG_LEN}_${SIG_N1}_${SIG_N2}_${SIG_N3}_${SIG_N4}_${SIG_N5}.txt"
+DS_DIR="${PRO_DIR}/emi_sig"
+DS_FILE="${DS_DIR}/datasets/data_${SIG_LEN}_${SIG_N1}_${SIG_N2}_${SIG_N3}_${SIG_N4}_${SIG_N5}.txt"
 
 
 if [[ ! -f ${DS_FILE} ]]; then
