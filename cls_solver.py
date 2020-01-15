@@ -28,8 +28,8 @@ parser.add_argument('--lr', default=0.1, type=float)
 parser.add_argument('--wd', default=0.0001, type=float)
 parser.add_argument('--nowd', action='store_true', default=False)
 parser.add_argument('--dropout_p', default=0, type=float)
-parser.add_argument('--tb_lg_freq', default=8, type=float)
-parser.add_argument('--val_freq', default=64, type=float)
+parser.add_argument('--tb_lg_freq', default=8, type=int)
+parser.add_argument('--val_freq', default=64, type=int)
 parser.add_argument('--data_path', default='', type=str)
 parser.add_argument('--save_many', action='store_true', default=False)
 
@@ -106,11 +106,10 @@ test_set = EMIDataset(
 
 if rank == 0:
     lg.info(f'==> Getting dataloader from {args.data_path} ...')
-    lg.info(f'ds len:{len(train_set)}')
 train_loader = DataLoader(
-    dataset=train_set, batch_size=args.batch_size, shuffle=True, num_workers=2, pin_memory=True)
+    dataset=train_set, batch_size=args.batch_size, shuffle=True, num_workers=2, pin_memory=False)
 test_loader = DataLoader(
-    dataset=test_set, batch_size=args.batch_size, shuffle=False, num_workers=2, pin_memory=True)
+    dataset=test_set, batch_size=args.batch_size, shuffle=False, num_workers=2, pin_memory=False)
 
 classes = ('pink', 'brown', 'laplace', 'uniform', 'exponential')
 assert args.num_classes == len(classes)
@@ -250,17 +249,10 @@ def main():
         last_t = time.time()
         for it, (inputs, targets) in enumerate(train_loader):
             data_t = time.time()
-            if rank == 0:
-                lg.info(f'==> inputs: {type(inputs)}, {tuple(inputs.shape)}')
-                lg.info(f'==> targets: {type(targets)}, {tuple(targets.shape)}')
             if using_gpu:
                 inputs, targets = inputs.cuda(), targets.cuda()
-                if rank == 0:
-                    lg.info(f'==> gpu inputs: {type(inputs)}, {tuple(inputs.shape)}')
-                    lg.info(f'==> gpu targets: {type(targets)}, {tuple(targets.shape)}')
     
             optimizer.zero_grad()
-            
             outputs = net(inputs)
             # outputs = outputs[0]
             loss = criterion(outputs, targets)
