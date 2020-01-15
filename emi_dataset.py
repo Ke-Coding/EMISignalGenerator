@@ -26,7 +26,7 @@ class EMIDataset(Dataset):
     def __getitem__(self, index):
         # index %= self.len
         signal, label = self.signals[index], self.labels[index]
-        return torch.from_numpy(signal), label
+        return torch.from_numpy(signal), torch.from_numpy(np.array([label]))
     
     def __len__(self):
         return self.len
