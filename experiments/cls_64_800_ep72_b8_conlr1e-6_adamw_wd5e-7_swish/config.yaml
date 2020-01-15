@@ -14,7 +14,7 @@ model:
         af_name: swish
 
 optm:
-    name: adam
+    name: adamw
     sche: con
     lr: 0.000001
 
