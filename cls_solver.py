@@ -134,7 +134,7 @@ if args.load_dir is not None:
 
 # Get criterion.
 if cfg.get('lb_smooth', 0) > 0:
-    criterion = LabelSmoothCELoss(cfg.lb_smooth, cfg.models.kwargs.)
+    criterion = LabelSmoothCELoss(cfg.lb_smooth, cfg.models.kwargs.input_size)
 else:
     criterion = torch.nn.CrossEntropyLoss()
 
