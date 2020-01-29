@@ -10,6 +10,7 @@ from torchvision.transforms import ToPILImage
 from torch.autograd import Variable
 from torch import optim
 import os
+import time
 import datetime
 from torchsummary import summary
 
@@ -129,6 +130,7 @@ def train(train_data_loader, optimizer):
     epoch_loss = 0.0
     train_dataset_length = 0
     tot_it = len(train_data_loader)
+    last_time = time.time()
     for it, (x_train, y_train) in enumerate(train_data_loader):
         if using_gpu:
             x_train, y_train = x_train.cuda(), y_train.cuda()
@@ -141,10 +143,11 @@ def train(train_data_loader, optimizer):
         epoch_loss += loss.item()
         epoch_acc += torch.argmax(y_pred, dim=1).eq(y_train).sum().item()
 
-        if it % 32 == 0:
+        if it % 64 == 0:
             print(f'it: [{it}/{tot_it}],'
                   f' Loss: {epoch_loss:.4f}/{it+1} = {epoch_loss/(it+1):.4f},'
-                  f' Acc: {epoch_acc}/{train_dataset_length} = {100 * epoch_acc/train_dataset_length:.3f}%')
+                  f' Acc: {epoch_acc}/{train_dataset_length} = {100 * epoch_acc/train_dataset_length:.3f}%'
+                  f' Time: {time.time()-last_time:.3f}ms')
 
     print(f'\ntrain_Epoch:'
           f' Loss: {epoch_loss/tot_it:.4f},'
@@ -167,7 +170,7 @@ def validation(test_data_loader):
             epoch_loss += loss.item()
             epoch_acc += torch.argmax(y_pred, dim=1).eq(y_test).sum().item()
 
-            if it % 32 == 0:
+            if it % 64 == 0:
                 print(f'it: [{it}/{tot_it}],'
                       f' Loss: {epoch_loss:.4f}/{it+1} = {epoch_loss / (it+1):.4f},'
                       f' Acc: {epoch_acc}/{test_dataset_length} = {100 * epoch_acc / test_dataset_length:.3f}%')
