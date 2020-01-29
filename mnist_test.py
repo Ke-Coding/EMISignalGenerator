@@ -14,10 +14,13 @@ import time
 import datetime
 from torchsummary import summary
 
-mnist_mean = 0.1307
-mnist_std = 0.3081
-epoch_n = 6
-batch_size = 64
+
+# constants
+MNIST_MEAN = 0.1307
+MNIST_STD = 0.3081
+EPOCH_N = 6
+BATCH_SIZE = 64
+SAVE_PATH = './Mobilenetv2.pth'
 
 
 using_gpu = torch.cuda.is_available()
@@ -96,7 +99,7 @@ def get_trainloader(batch_size):
                              transform=transforms.Compose([
                                  transforms.ToTensor(),
                                  transforms.Normalize(
-                                     (mnist_mean,), (mnist_std,)
+                                     (MNIST_MEAN,), (MNIST_STD,)
                                  )
                              ]))
     return data.DataLoader(
@@ -114,7 +117,7 @@ def get_testloader(batch_size):
                              transform=transforms.Compose([
                                  transforms.ToTensor(),
                                  transforms.Normalize(
-                                     (mnist_mean,), (mnist_std,)
+                                     (MNIST_MEAN,), (MNIST_STD,)
                                  )
                              ]))
     return data.DataLoader(
@@ -171,13 +174,7 @@ def validation(test_data_loader):
             loss = nn.functional.cross_entropy(y_pred, y_test)
             epoch_loss += loss.item()
             epoch_acc += torch.argmax(y_pred, dim=1).eq(y_test).sum().item()
-
-            if it % 64 == 0:
-                print(f'it: [{it}/{tot_it}],'
-                      f' Loss: {epoch_loss:.4f}/{it+1} = {epoch_loss / (it+1):.4f},'
-                      f' Acc: {epoch_acc}/{test_dataset_length} = {100 * epoch_acc / test_dataset_length:.3f}%')
         model.train()
-        
     return epoch_loss/tot_it, 100 * epoch_acc/test_dataset_length
 
 
@@ -187,26 +184,32 @@ if using_gpu:
 
 
 def main():
-    PATH = './Mobilenetv2.pth'
     summary(model=model, input_size=(1, 28, 28))
     print(f'\n=== {["not using", "using"][using_gpu]} gpu ===')
     # pretrained_net = torch.load(PATH)
     # model.load_state_dict(pretrained_net)
     optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
-    train_data_loader = get_trainloader(batch_size=batch_size)
-    test_data_loader = get_testloader(batch_size=batch_size)
-    last_time = time.time()
-    for epoch in range(epoch_n):
-        print(f'\n=== At epoch: [{epoch}/{epoch_n}] ===')
+    train_data_loader = get_trainloader(batch_size=BATCH_SIZE)
+    test_data_loader = get_testloader(batch_size=BATCH_SIZE)
+    last_time = start_time = time.time()
+    best_val_acc = 0
+    for epoch in range(EPOCH_N):
+        print(f'\n=== At epoch: [{epoch}/{EPOCH_N}] ===')
         train_loss, train_acc = train(train_data_loader=train_data_loader, optimizer=optimizer)
         val_loss, val_acc = validation(test_data_loader=test_data_loader)
-        print(f'ep: [{epoch}/{epoch_n}],'
+        print(f'Epoch complete,'
               f' t-Loss: {train_loss:.4f}, t-Acc: {train_acc:.3f}%,'
               f' v-Loss: {val_loss:.4f}, v-Acc: {val_acc:.3f}%,'
               f' epoch time: {time.time()-last_time:.2f}s')
+
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            print(f'Best ckpt(acc{val_acc:.3f}) is saved at{SAVE_PATH}')
+            torch.save(model.state_dict(), SAVE_PATH)
         last_time = time.time()
-        
-    torch.save(model.state_dict(), PATH)
+
+    print(f'\n=== Training complete, best val_acc: {best_val_acc:.3f}%, total time: {time.time()-start_time}s ===')
+    
 
 
 if __name__ == '__main__':
