@@ -146,7 +146,7 @@ def train(train_data_loader, optimizer):
                   f'Loss:{epoch_loss:.4f}/{it+1} = {epoch_loss/(it+1):.4f}, '
                   f'Acc:{epoch_acc}/{train_dataset_length} = {100 * epoch_acc/train_dataset_length:.3f}%')
 
-    print(f'train_Epoch:Loss is:{epoch_loss/tot_it:4f},Acc is:{100 * epoch_acc/train_dataset_length:3f}%')
+    print(f'train_Epoch:Loss is:{epoch_loss/tot_it:.4f},Acc is:{100 * epoch_acc/train_dataset_length:.3f}%')
 
 
 def validation(test_data_loader):
@@ -170,7 +170,7 @@ def validation(test_data_loader):
                       f'Loss:{epoch_loss:.4f}/{it+1} = {epoch_loss / (it+1):.4f}, '
                       f'Acc:{epoch_acc}/{test_dataset_length} = {100 * epoch_acc / test_dataset_length:.3f}%')
         model.train()
-        print(f'test_Epoch:Loss is:{epoch_loss/tot_it:4f},Acc is:{100 * epoch_acc/test_dataset_length:3f}%')
+        print(f'test_Epoch:Loss is:{epoch_loss/tot_it:.4f},Acc is:{100 * epoch_acc/test_dataset_length:.3f}%')
 
 
 model = Model()
