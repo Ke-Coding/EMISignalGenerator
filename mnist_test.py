@@ -167,8 +167,8 @@ model = MBV2(
     input_ch=1,
     num_classes=10,
     dropout_p=0.2,  # a scalar(probability) or None, if None: do not use dropout
-    channels=[16, 32, 64, 144],
-    last_ch=192,
+    channels=[8, 12, 24, 32],
+    last_ch=64,
     strides=[1, 2, 1],
 )
 if using_gpu:
@@ -180,7 +180,8 @@ def main():
     print(f'\n=== {["not using", "using"][using_gpu]} gpu ===')
     # pretrained_net = torch.load(PATH)
     # model.load_state_dict(pretrained_net)
-    optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
+    optimizer = torch.optim.SGD(params=model.parameters(), lr=0.01, momentum=0.9, weight_decay=1e-5, nesterov=True)
+    # optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
     train_data_loader = get_trainloader(batch_size=BATCH_SIZE)
     test_data_loader = get_testloader(batch_size=BATCH_SIZE)
     last_time = start_time = time.time()
