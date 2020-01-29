@@ -30,7 +30,7 @@ class Model(nn.Module):
     def __init__(self):
         super(Model, self).__init__()
 
-        channels = [16, 32, 52, 80]
+        channels = [16, 32, 64, 144]
         strides = [1, 2, 1]
         ex_ch = [round(ch * 2.5) for ch in channels]
 
@@ -73,7 +73,7 @@ class Model(nn.Module):
             nn.BatchNorm2d(channels[3])
         )
 
-        self.last_ch = 128
+        self.last_ch = 192
         self.conv2 = nn.Sequential(
             nn.Conv2d(channels[-1], self.last_ch, kernel_size=1, padding=0, stride=1, bias=False),
             nn.BatchNorm2d(self.last_ch),
@@ -210,7 +210,6 @@ def main():
 
     print(f'\n=== Training complete, best val_acc: {best_val_acc:.3f}%, total time: {time.time()-start_time:.2f}s ===')
     
-
 
 if __name__ == '__main__':
     main()
