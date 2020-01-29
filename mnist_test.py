@@ -2,86 +2,69 @@ import torch
 import torch.utils.data as data
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision as tv
-import numpy as np
-import matplotlib.pyplot as plt
 from torchvision import transforms, datasets
-from torchvision.transforms import ToPILImage
-from torch.autograd import Variable
-from torch import optim
-import os
 import time
-import datetime
+import os
 from torchsummary import summary
-
 
 # constants
 MNIST_MEAN = 0.1307
 MNIST_STD = 0.3081
 EPOCH_N = 6
 BATCH_SIZE = 128
-SAVE_PATH = './Mobilenetv2.pth'
-
+SAVE_PATH = './mbv2.pth'
 
 using_gpu = torch.cuda.is_available()
 
 
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
+class LinearBottleneck(nn.Module):
+    def __init__(self, cin, k, cout, stride):
+        super(LinearBottleneck, self).__init__()
+        ex_ch = round(cin * k)
+        self.block = nn.Sequential(
+            nn.Conv2d(cin, ex_ch, kernel_size=1, padding=0, stride=1, bias=False),
+            nn.BatchNorm2d(ex_ch),
+            nn.ReLU6(),
+            nn.Conv2d(ex_ch, ex_ch, kernel_size=3, padding=1, stride=stride, groups=ex_ch, bias=False),
+            nn.BatchNorm2d(ex_ch),
+            nn.ReLU6(),
+            nn.Conv2d(ex_ch, cout, kernel_size=1, padding=0, stride=1, bias=False),
+            nn.BatchNorm2d(cout)
+        )
+    
+    def forward(self, x):
+        return self.block(x)
 
-        channels = [16, 32, 64, 144]
-        strides = [1, 2, 1]
-        ex_ch = [round(ch * 2.5) for ch in channels]
 
+class MBV2(nn.Module):
+    def __init__(self, input_ch, num_classes, dropout_p, channels, last_ch, strides):
+        super(MBV2, self).__init__()
+        
         self.conv1 = nn.Sequential(
-            nn.Conv2d(1, channels[0], kernel_size=3, padding=1, stride=2, bias=False),
+            nn.Conv2d(input_ch, channels[0], kernel_size=3, padding=1, stride=2, bias=False),
             nn.BatchNorm2d(channels[0]),
             nn.ReLU6()
         )
-
+        
         # Bottleneck第一层和第三层都是pointwise卷积，也即kernel_size=1，groups=1的卷积，
         # 第二层是depthwise卷积，也即kernel_size=3，groups=channels的卷积
-        self.bottleneck1 = nn.Sequential(
-            nn.Conv2d(channels[0], ex_ch[0], kernel_size=1, padding=0, stride=1, bias=False),
-            nn.BatchNorm2d(ex_ch[0]),
-            nn.ReLU6(),
-            nn.Conv2d(ex_ch[0], ex_ch[0], kernel_size=3, padding=1, stride=strides[0], groups=ex_ch[0], bias=False),
-            nn.BatchNorm2d(ex_ch[0]),
-            nn.ReLU6(),
-            nn.Conv2d(ex_ch[0], channels[1], kernel_size=1, padding=0, stride=1, bias=False),
-            nn.BatchNorm2d(channels[1])
-        )
-        self.bottleneck2 = nn.Sequential(
-            nn.Conv2d(channels[1], ex_ch[1], kernel_size=1, padding=0, stride=1, bias=False),
-            nn.BatchNorm2d(ex_ch[1]),
-            nn.ReLU6(),
-            nn.Conv2d(ex_ch[1], ex_ch[1], kernel_size=3, padding=1, stride=strides[1], groups=ex_ch[1], bias=False),
-            nn.BatchNorm2d(ex_ch[1]),
-            nn.ReLU6(),
-            nn.Conv2d(ex_ch[1], channels[2], kernel_size=1, padding=0, stride=1, bias=False),
-            nn.BatchNorm2d(channels[2])
-        )
-        self.bottleneck3 = nn.Sequential(
-            nn.Conv2d(channels[2], ex_ch[2], kernel_size=1, padding=0, stride=1, bias=False),
-            nn.BatchNorm2d(ex_ch[2]),
-            nn.ReLU6(),
-            nn.Conv2d(ex_ch[2], ex_ch[2], kernel_size=3, padding=1, stride=strides[2], groups=ex_ch[2], bias=False),
-            nn.BatchNorm2d(ex_ch[2]),
-            nn.ReLU6(),
-            nn.Conv2d(ex_ch[2], channels[3], kernel_size=1, padding=0, stride=1, bias=False),
-            nn.BatchNorm2d(channels[3])
-        )
-
-        self.last_ch = 192
+        self.bottleneck1 = LinearBottleneck(cin=channels[0], k=3, cout=channels[1], stride=strides[0])
+        self.bottleneck2 = LinearBottleneck(cin=channels[1], k=3, cout=channels[2], stride=strides[1])
+        self.bottleneck3 = LinearBottleneck(cin=channels[2], k=3, cout=channels[3], stride=strides[2])
+        
+        self.last_ch = last_ch
         self.conv2 = nn.Sequential(
             nn.Conv2d(channels[-1], self.last_ch, kernel_size=1, padding=0, stride=1, bias=False),
             nn.BatchNorm2d(self.last_ch),
             nn.ReLU6()
         )
-        self.pool1 = nn.AvgPool2d(kernel_size=7)
-        self.Dense = nn.Linear(self.last_ch, 10)
-
+        
+        self.pool1 = nn.AdaptiveAvgPool2d(output_size=(1, 1))
+        self.using_dropout = dropout_p is not None
+        if self.using_dropout:
+            self.dropout = nn.Dropout(p=dropout_p)
+        self.Dense = nn.Linear(self.last_ch, num_classes)
+    
     def forward(self, x):
         out = self.conv1(x)
         out = self.bottleneck1(out)
@@ -90,8 +73,10 @@ class Model(nn.Module):
         out = self.conv2(out)
         out = self.pool1(out)
         out = out.view(-1, self.last_ch)
-        out = self.Dense(out)
-        return out
+        if self.using_dropout:
+            out = self.dropout(out)
+        logits = self.Dense(out)
+        return logits
 
 
 def get_trainloader(batch_size):
@@ -123,10 +108,10 @@ def get_testloader(batch_size):
     return data.DataLoader(
         dataset=dataset,
         batch_size=batch_size,
-        shuffle=False,                   # 每个epoch是否混淆
-        num_workers=2,                   # 多进程并发装载
-        pin_memory=True,                 # 是否使用锁页内存
-        drop_last=False,                 # 是否丢弃最后一个不完整的batch
+        shuffle=False,  # 每个epoch是否混淆
+        num_workers=2,  # 多进程并发装载
+        pin_memory=True,  # 是否使用锁页内存
+        drop_last=False,  # 是否丢弃最后一个不完整的batch
     )
 
 
@@ -147,15 +132,15 @@ def train(train_data_loader, optimizer):
         optimizer.step()
         epoch_loss += loss.item()
         epoch_acc += torch.argmax(y_pred, dim=1).eq(y_train).sum().item()
-
+        
         if it % 128 == 0:
             print(f'it: [{it}/{tot_it}],'
-                  f' Loss: {epoch_loss:.4f}/{it+1} = {epoch_loss/(it+1):.4f},'
-                  f' Acc: {epoch_acc}/{train_dataset_length} = {100 * epoch_acc/train_dataset_length:.3f}%,'
-                  f' Iter time: {time.time()-last_time:.2f}s')
+                  f' Loss: {epoch_loss:.4f}/{it + 1} = {epoch_loss / (it + 1):.4f},'
+                  f' Acc: {epoch_acc}/{train_dataset_length} = {100 * epoch_acc / train_dataset_length:.3f}%,'
+                  f' Iter time: {time.time() - last_time:.2f}s')
             last_time = time.time()
-
-    return epoch_loss/tot_it, 100 * epoch_acc/train_dataset_length
+    
+    return epoch_loss / tot_it, 100 * epoch_acc / train_dataset_length
 
 
 def validation(test_data_loader):
@@ -175,10 +160,17 @@ def validation(test_data_loader):
             epoch_loss += loss.item()
             epoch_acc += torch.argmax(y_pred, dim=1).eq(y_test).sum().item()
         model.train()
-    return epoch_loss/tot_it, 100 * epoch_acc/test_dataset_length
+    return epoch_loss / tot_it, 100 * epoch_acc / test_dataset_length
 
 
-model = Model()
+model = MBV2(
+    input_ch=1,
+    num_classes=10,
+    dropout_p=0.2,  # a scalar(probability) or None, if None: do not use dropout
+    channels=[16, 32, 64, 144],
+    last_ch=192,
+    strides=[1, 2, 1],
+)
 if using_gpu:
     model = model.cuda()
 
@@ -200,16 +192,19 @@ def main():
         print(f'Epoch complete,'
               f' t-Loss: {train_loss:.4f}, t-Acc: {train_acc:.3f}%,'
               f' v-Loss: {val_loss:.4f}, v-Acc: {val_acc:.3f}%,'
-              f' epoch time: {time.time()-last_time:.2f}s')
-
+              f' epoch time: {time.time() - last_time:.2f}s')
+        
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             print(f'Best ckpt(acc {val_acc:.3f}) is saved at: {SAVE_PATH}')
             torch.save(model.state_dict(), SAVE_PATH)
         last_time = time.time()
-
-    print(f'\n=== Training complete, best val_acc: {best_val_acc:.3f}%, total time: {time.time()-start_time:.2f}s ===')
     
+    print(f'\n=== Training complete, best val_acc: {best_val_acc:.3f}%, total time: {time.time() - start_time:.2f}s ===')
+
 
 if __name__ == '__main__':
+    os.chdir('/content/drive/My Drive/mbv2_test')
+    print('cwd: %s' % os.getcwd())
+    
     main()
