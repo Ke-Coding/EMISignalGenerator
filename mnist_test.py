@@ -180,7 +180,7 @@ def main():
     print(f'\n=== {["not using", "using"][using_gpu]} gpu ===')
     # pretrained_net = torch.load(PATH)
     # model.load_state_dict(pretrained_net)
-    optimizer = torch.optim.SGD(params=model.parameters(), lr=0.01, momentum=0.9, weight_decay=1e-5, nesterov=True)
+    optimizer = torch.optim.SGD(params=model.parameters(), lr=0.005, momentum=0.9, weight_decay=1e-5, nesterov=True)
     # optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
     train_data_loader = get_trainloader(batch_size=BATCH_SIZE)
     test_data_loader = get_testloader(batch_size=BATCH_SIZE)
