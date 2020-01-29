@@ -17,6 +17,8 @@ from torchsummary import summary
 mnist_mean = 0.1307
 mnist_std = 0.3081
 epoch_n = 6
+batch_size = 64
+
 
 using_gpu = torch.cuda.is_available()
 
@@ -143,24 +145,24 @@ def train(train_data_loader, optimizer):
         epoch_loss += loss.item()
         epoch_acc += torch.argmax(y_pred, dim=1).eq(y_train).sum().item()
 
-        if it % 64 == 0:
+        if it % 128 == 0:
             print(f'it: [{it}/{tot_it}],'
                   f' Loss: {epoch_loss:.4f}/{it+1} = {epoch_loss/(it+1):.4f},'
-                  f' Acc: {epoch_acc}/{train_dataset_length} = {100 * epoch_acc/train_dataset_length:.3f}%'
-                  f' Time: {time.time()-last_time:.3f}ms')
+                  f' Acc: {epoch_acc}/{train_dataset_length} = {100 * epoch_acc/train_dataset_length:.3f}%,'
+                  f' Time: {time.time()-last_time:.2f}s')
+            last_time = time.time()
 
-    print(f'\ntrain_Epoch:'
-          f' Loss: {epoch_loss/tot_it:.4f},'
-          f' Acc: {100 * epoch_acc/train_dataset_length:.3f}%')
+    return epoch_loss/tot_it, 100 * epoch_acc/train_dataset_length
 
 
 def validation(test_data_loader):
+    epoch_acc = 0
+    epoch_loss = 0.0
+    test_dataset_length = 0
+    tot_it = len(test_data_loader)
+    
     with torch.no_grad():
         model.eval()
-        epoch_acc = 0
-        epoch_loss = 0.0
-        test_dataset_length = 0
-        tot_it = len(test_data_loader)
         for it, (x_test, y_test) in enumerate(test_data_loader):
             test_dataset_length += len(y_test)
             if using_gpu:
@@ -175,9 +177,8 @@ def validation(test_data_loader):
                       f' Loss: {epoch_loss:.4f}/{it+1} = {epoch_loss / (it+1):.4f},'
                       f' Acc: {epoch_acc}/{test_dataset_length} = {100 * epoch_acc / test_dataset_length:.3f}%')
         model.train()
-        print(f'\ntest_Epoch:'
-              f' Loss: {epoch_loss/tot_it:.4f},'
-              f' Acc: {100 * epoch_acc/test_dataset_length:.3f}%')
+        
+    return epoch_loss/tot_it, 100 * epoch_acc/test_dataset_length
 
 
 model = Model()
@@ -191,13 +192,19 @@ def main():
     print(f'\n=== {["not using", "using"][using_gpu]} gpu ===')
     # pretrained_net = torch.load(PATH)
     # model.load_state_dict(pretrained_net)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    train_data_loader = get_trainloader(64)
-    test_data_loader = get_testloader(64)
+    optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
+    train_data_loader = get_trainloader(batch_size=batch_size)
+    test_data_loader = get_testloader(batch_size=batch_size)
+    last_time = time.time()
     for epoch in range(epoch_n):
         print(f'\n=== At epoch: [{epoch}/{epoch_n}] ===')
-        train(train_data_loader=train_data_loader, optimizer=optimizer)
-        validation(test_data_loader=test_data_loader)
+        train_loss, train_acc = train(train_data_loader=train_data_loader, optimizer=optimizer)
+        val_loss, val_acc = validation(test_data_loader=test_data_loader)
+        print(f'ep: [{epoch}/{epoch_n}],'
+              f' t-Loss: {train_loss:.4f}, t-Acc: {train_acc:.3f}%'
+              f' v-Loss: {val_loss:.4f}, v-Acc: {val_acc:.3f}%')
+        last_time = time.time()
+        
     torch.save(model.state_dict(), PATH)
 
 
