@@ -24,7 +24,7 @@ class Model(nn.Module):
     def __init__(self):
         super(Model, self).__init__()
 
-        channels = [32, 64, 144, 192]
+        channels = [16, 32, 64, 96]
         strides = [1, 2, 1]
         ex_ch = [ch * 3 for ch in channels]
 
@@ -67,7 +67,7 @@ class Model(nn.Module):
             nn.BatchNorm2d(channels[3])
         )
 
-        self.last_ch = 320
+        self.last_ch = 144
         self.conv2 = nn.Sequential(
             nn.Conv2d(channels[-1], self.last_ch, kernel_size=1, padding=0, stride=1, bias=False),
             nn.BatchNorm2d(self.last_ch),
@@ -142,11 +142,13 @@ def train(train_data_loader, optimizer):
         epoch_acc += torch.argmax(y_pred, dim=1).eq(y_train).sum().item()
 
         if it % 32 == 0:
-            print(f'it:{it}/{tot_it}, '
-                  f'Loss:{epoch_loss:.4f}/{it+1} = {epoch_loss/(it+1):.4f}, '
-                  f'Acc:{epoch_acc}/{train_dataset_length} = {100 * epoch_acc/train_dataset_length:.3f}%')
+            print(f'it: [{it}/{tot_it}],'
+                  f' Loss: {epoch_loss:.4f}/{it+1} = {epoch_loss/(it+1):.4f},'
+                  f' Acc: {epoch_acc}/{train_dataset_length} = {100 * epoch_acc/train_dataset_length:.3f}%')
 
-    print(f'train_Epoch:Loss is:{epoch_loss/tot_it:.4f},Acc is:{100 * epoch_acc/train_dataset_length:.3f}%')
+    print(f'\ntrain_Epoch:'
+          f' Loss: {epoch_loss/tot_it:.4f},'
+          f' Acc: {100 * epoch_acc/train_dataset_length:.3f}%')
 
 
 def validation(test_data_loader):
@@ -166,11 +168,13 @@ def validation(test_data_loader):
             epoch_acc += torch.argmax(y_pred, dim=1).eq(y_test).sum().item()
 
             if it % 32 == 0:
-                print(f'it:{it}/{tot_it}, '
-                      f'Loss:{epoch_loss:.4f}/{it+1} = {epoch_loss / (it+1):.4f}, '
-                      f'Acc:{epoch_acc}/{test_dataset_length} = {100 * epoch_acc / test_dataset_length:.3f}%')
+                print(f'it: [{it}/{tot_it}],'
+                      f' Loss: {epoch_loss:.4f}/{it+1} = {epoch_loss / (it+1):.4f},'
+                      f' Acc: {epoch_acc}/{test_dataset_length} = {100 * epoch_acc / test_dataset_length:.3f}%')
         model.train()
-        print(f'test_Epoch:Loss is:{epoch_loss/tot_it:.4f},Acc is:{100 * epoch_acc/test_dataset_length:.3f}%')
+        print(f'\ntest_Epoch:'
+              f' Loss: {epoch_loss/tot_it:.4f},'
+              f' Acc: {100 * epoch_acc/test_dataset_length:.3f}%')
 
 
 model = Model()
@@ -188,7 +192,7 @@ def main():
     train_data_loader = get_trainloader(64)
     test_data_loader = get_testloader(64)
     for epoch in range(epoch_n):
-        print(f'\n=== At epoch:{epoch}/{epoch_n} ===')
+        print(f'\n=== At epoch: [{epoch}/{epoch_n}] ===')
         train(train_data_loader=train_data_loader, optimizer=optimizer)
         validation(test_data_loader=test_data_loader)
     torch.save(model.state_dict(), PATH)
