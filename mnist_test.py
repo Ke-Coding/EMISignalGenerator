@@ -149,7 +149,7 @@ def train(train_data_loader, optimizer):
             print(f'it: [{it}/{tot_it}],'
                   f' Loss: {epoch_loss:.4f}/{it+1} = {epoch_loss/(it+1):.4f},'
                   f' Acc: {epoch_acc}/{train_dataset_length} = {100 * epoch_acc/train_dataset_length:.3f}%,'
-                  f' Time: {time.time()-last_time:.2f}s')
+                  f' Iter time: {time.time()-last_time:.2f}s')
             last_time = time.time()
 
     return epoch_loss/tot_it, 100 * epoch_acc/train_dataset_length
@@ -201,8 +201,9 @@ def main():
         train_loss, train_acc = train(train_data_loader=train_data_loader, optimizer=optimizer)
         val_loss, val_acc = validation(test_data_loader=test_data_loader)
         print(f'ep: [{epoch}/{epoch_n}],'
-              f' t-Loss: {train_loss:.4f}, t-Acc: {train_acc:.3f}%'
-              f' v-Loss: {val_loss:.4f}, v-Acc: {val_acc:.3f}%')
+              f' t-Loss: {train_loss:.4f}, t-Acc: {train_acc:.3f}%,'
+              f' v-Loss: {val_loss:.4f}, v-Acc: {val_acc:.3f}%,'
+              f' epoch time: {time.time()-last_time:.2f}s')
         last_time = time.time()
         
     torch.save(model.state_dict(), PATH)
