@@ -30,7 +30,7 @@ class Model(nn.Module):
     def __init__(self):
         super(Model, self).__init__()
 
-        channels = [16, 32, 64, 96]
+        channels = [16, 32, 52, 80]
         strides = [1, 2, 1]
         ex_ch = [ch * 3 for ch in channels]
 
@@ -73,7 +73,7 @@ class Model(nn.Module):
             nn.BatchNorm2d(channels[3])
         )
 
-        self.last_ch = 144
+        self.last_ch = 128
         self.conv2 = nn.Sequential(
             nn.Conv2d(channels[-1], self.last_ch, kernel_size=1, padding=0, stride=1, bias=False),
             nn.BatchNorm2d(self.last_ch),
