@@ -32,7 +32,7 @@ class Model(nn.Module):
 
         channels = [16, 32, 52, 80]
         strides = [1, 2, 1]
-        ex_ch = [ch * 3 for ch in channels]
+        ex_ch = [round(ch * 2.5) for ch in channels]
 
         self.conv1 = nn.Sequential(
             nn.Conv2d(1, channels[0], kernel_size=3, padding=1, stride=2, bias=False),
