@@ -19,7 +19,7 @@ from torchsummary import summary
 MNIST_MEAN = 0.1307
 MNIST_STD = 0.3081
 EPOCH_N = 6
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 SAVE_PATH = './Mobilenetv2.pth'
 
 
@@ -204,11 +204,11 @@ def main():
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            print(f'Best ckpt(acc{val_acc:.3f}) is saved at{SAVE_PATH}')
+            print(f'Best ckpt(acc {val_acc:.3f}) is saved at: {SAVE_PATH}')
             torch.save(model.state_dict(), SAVE_PATH)
         last_time = time.time()
 
-    print(f'\n=== Training complete, best val_acc: {best_val_acc:.3f}%, total time: {time.time()-start_time}s ===')
+    print(f'\n=== Training complete, best val_acc: {best_val_acc:.3f}%, total time: {time.time()-start_time:.2f}s ===')
     
 
 
