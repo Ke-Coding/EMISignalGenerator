@@ -2,11 +2,11 @@ EXP_DIR=$(pwd)
 PRO_DIR=$(dirname $(dirname "$PWD"))
 
 SIG_LEN=64
-SIG_N1=800
-SIG_N2=800
-SIG_N3=800
-SIG_N4=800
-SIG_N5=800
+SIG_N1=100
+SIG_N2=100
+SIG_N3=100
+SIG_N4=100
+SIG_N5=100
 
 DS_DIR="${PRO_DIR}/emi_sig"
 DS_FILE="${DS_DIR}/datasets/data_${SIG_LEN}_${SIG_N1}_${SIG_N2}_${SIG_N3}_${SIG_N4}_${SIG_N5}.txt"
@@ -29,7 +29,7 @@ srun \
 --mpi=pmi2 -p $1 -n1 --gres=gpu:2 \
 --ntasks-per-node=2 \
 --cpus-per-task=5 \
-python -u -m cls_solver \
+python -u -m main \
 --cfg_dir=config.yaml \
 --log_dir=$(date +cls_%Y%m%d_%H_%M_%S) \
 --data_dir=${DS_FILE} \
