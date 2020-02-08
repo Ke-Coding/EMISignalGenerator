@@ -1,6 +1,5 @@
 from collections import OrderedDict
 import torch.nn as nn
-import torch.nn.functional as F
 import torchsummary
 
 from .mbconv import MBConv
@@ -97,6 +96,7 @@ class CNNComb(nn.Module):
         for p in self.encoder.parameters():
             p.requires_grad = False
         
+        self.input_ch = input_ch
         self.af = get_af(af_name=af_name)
         self.back_bone = self._make_backbone(
             cins=[input_ch] + channels[:-1],
@@ -126,9 +126,9 @@ class CNNComb(nn.Module):
         return nn.Sequential(backbone)
     
     def forward(self, x):
-        x = x.view(x.shape[0], 1, -1)
-        embedding = self.encoder(x)
-        feature = self.back_bone(embedding)
+        x = x.view(x.shape[0], self.input_ch, -1)
+        gaussian, _, _ = self.encoder(x)
+        feature = self.back_bone(gaussian)
         feature = self.af(self.last_conv(feature), inplace=True).mean(dim=[1, 2])
         if self.using_dropout:
             feature = self.dropout(feature)

@@ -19,7 +19,7 @@ class ClsSolver(BasicSolver):
             self.criterion = torch.nn.CrossEntropyLoss()
         
         super(ClsSolver, self).build_solver()
-
+    
     def test_solver(self):
         self.net.eval()
         with torch.no_grad():
