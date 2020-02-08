@@ -69,7 +69,7 @@ class VAESolver(BasicSolver):
                 train_loss_avg.update(loss.item())
                 train_bce_avg.update(bce_loss.item())
                 train_kld_avg.update(kld_loss.item())
-                torch.nn.utils.clip_grad_norm_(self.net.parameters(), self.cfg.grad_clip)
+                torch.nn.utils.clip_grad_norm_(filter(lambda p: p.requires_grad, self.net.parameters()), self.cfg.grad_clip)
                 self.optm.step()
                 train_t = time.time()
                 

@@ -70,7 +70,7 @@ class ClsSolver(BasicSolver):
                 loss = self.criterion(outputs, targets)
                 loss.backward()
                 train_loss_avg.update(loss.item())
-                torch.nn.utils.clip_grad_norm_(self.net.parameters(), self.cfg.grad_clip)
+                torch.nn.utils.clip_grad_norm_(filter(lambda p: p.requires_grad, self.net.parameters()), self.cfg.grad_clip)
                 self.optm.step()
                 train_t = time.time()
             
