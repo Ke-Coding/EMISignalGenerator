@@ -24,13 +24,13 @@ class VAESolver(BasicSolver):
         with torch.no_grad():
             tot_loss, tot_bce, tot_kld, tot_it = 0., 0., 0., len(self.test_loader)
             for it, (inputs, _) in enumerate(self.test_loader):
+                if self.cfg.using_gpu:
+                    inputs = inputs.cuda()
                 if it == 0:
                     gaussian, mu, log_sigma = self.net.encoder(inputs.view(inputs.shape[0], 1, -1))
                     print('mu : ', mu)
                     print('sgm: ', log_sigma)
                     print('gau: ', gaussian)
-                if self.cfg.using_gpu:
-                    inputs = inputs.cuda()
                 x_rec, mu, log_sigma = self.net(inputs)
                 bce_loss, kld_loss = vae_loss(inputs, x_rec, mu, log_sigma)
                 loss = bce_loss + kld_loss
