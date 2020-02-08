@@ -21,7 +21,8 @@ class LabelSmoothCELoss(torch.nn.Module):
 
 
 def vae_loss(x, x_rec, mu, log_sigma):
-    mce_loss = F.mse_loss(x_rec, x)
+    # mce_loss = F.mse_loss(x_rec, x)
     # bce_loss = 15 * F.binary_cross_entropy(x_rec, x, reduction='mean')
+    l1 = F.kl_div(x_rec, x, reduction='mean')
     kld_loss = -0.5 * torch.mean(1 + log_sigma - mu*mu - log_sigma.exp())
-    return mce_loss, kld_loss
+    return l1, kld_loss
