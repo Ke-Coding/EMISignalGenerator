@@ -1,2 +1,8 @@
-build/*
-dist/*
+emi_sig/build/*
+emi_sig/dist/*
+mmnist/*
+__pycache__
+events*.*
+*.txt
+*.pth.tar
+.idea
