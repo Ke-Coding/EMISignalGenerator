@@ -126,6 +126,7 @@ class CNNComb(nn.Module):
         return nn.Sequential(backbone)
     
     def forward(self, x):
+        x = x.view(x.shape[0], 1, -1)
         embedding = self.encoder(x)
         feature = self.back_bone(embedding)
         feature = self.af(self.last_conv(feature), inplace=True).mean(dim=[1, 2])
