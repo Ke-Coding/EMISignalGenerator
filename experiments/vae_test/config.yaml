@@ -18,11 +18,11 @@ vae:
     optm:
         name: adamw
         kwargs:
-            lr: 0.000001
+            lr: 0.0001
 #            nesterov: True
 #            momentum: 0.9
             betas: !!python/tuple [0.5, 0.999]
-            weight_decay: 0.0000001
+            weight_decay: 0.00001
         nowd: True
         nowd_dict:
             bn_b:
