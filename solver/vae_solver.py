@@ -74,10 +74,10 @@ class VAESolver(BasicSolver):
                 train_t = time.time()
                 
                 if it % self.cfg.tb_lg_freq == 0 or it == tot_it - 1:
-                    self.tb_lg.add_scalar('train_loss', train_loss_avg.avg, it + tot_it * epoch)
-                    self.tb_lg.add_scalar('train_bce', train_bce_avg.avg, it + tot_it * epoch)
-                    self.tb_lg.add_scalar('train_kld', train_kld_avg.avg, it + tot_it * epoch)
-                    self.tb_lg.add_scalar('lr', self.sche.get_lr()[0], it + tot_it * epoch)
+                    self.tb_lg.add_scalar('vae_t_loss', train_loss_avg.avg, it + tot_it * epoch)
+                    self.tb_lg.add_scalar('vae_t_bce', train_bce_avg.avg, it + tot_it * epoch)
+                    self.tb_lg.add_scalar('vae_t_kld', train_kld_avg.avg, it + tot_it * epoch)
+                    self.tb_lg.add_scalar('vae_lr', self.sche.get_lr()[0], it + tot_it * epoch)
                 
                 if it % self.cfg.val_freq == 0 or it == tot_it - 1:
                     test_loss, test_bce, test_kld = self.test_solver()
@@ -98,9 +98,9 @@ class VAESolver(BasicSolver):
                         f' lr[{self.sche.get_lr()[0]:.4g}]'
                         f' rem-t[{remain_time}] ({finish_time})'
                     )
-                    self.tb_lg.add_scalar('test_loss', test_loss, it + tot_it * epoch)
-                    self.tb_lg.add_scalar('test_bce', test_bce, it + tot_it * epoch)
-                    self.tb_lg.add_scalar('test_kld', test_kld, it + tot_it * epoch)
+                    self.tb_lg.add_scalar('vae_v_loss', test_loss, it + tot_it * epoch)
+                    self.tb_lg.add_scalar('vae_v_bce', test_bce, it + tot_it * epoch)
+                    self.tb_lg.add_scalar('vae_v_kld', test_kld, it + tot_it * epoch)
                     
                     is_best = test_loss < lowest_loss
                     lowest_loss = min(test_loss, lowest_loss)
@@ -127,8 +127,8 @@ class VAESolver(BasicSolver):
                 }, model_ckpt_path)
                 self.lg.info(f'==> Saving cls model at epoch{epoch} complete.')
         
-        self.tb_lg.add_scalar('lowest_test_loss', lowest_loss, 0)
-        self.tb_lg.add_scalar('lowest_test_loss', lowest_loss, len(self.train_loader) * self.cfg.epochs)
+        self.tb_lg.add_scalar('vae_lowest_v_loss', lowest_loss, 0)
+        self.tb_lg.add_scalar('vae_lowest_v_loss', lowest_loss, len(self.train_loader) * self.cfg.epochs)
         self.lg.info(
             f'==> End training,'
             f' total time cost: {time.time() - start_train_t:.3f},'

@@ -79,9 +79,9 @@ class ClsSolver(BasicSolver):
                 train_acc_avg.update(val=100. * correct / pred, num=pred / self.cfg.batch_size)
             
                 if it % self.cfg.tb_lg_freq == 0 or it == tot_it - 1:
-                    self.tb_lg.add_scalar('train_loss', train_loss_avg.avg, it + tot_it * epoch)
-                    self.tb_lg.add_scalar('train_acc', train_acc_avg.avg, it + tot_it * epoch)
-                    self.tb_lg.add_scalar('lr', self.sche.get_lr()[0], it + tot_it * epoch)
+                    self.tb_lg.add_scalar('cls_t_loss', train_loss_avg.avg, it + tot_it * epoch)
+                    self.tb_lg.add_scalar('cls_t_acc', train_acc_avg.avg, it + tot_it * epoch)
+                    self.tb_lg.add_scalar('cls_lr', self.sche.get_lr()[0], it + tot_it * epoch)
             
                 if it % self.cfg.val_freq == 0 or it == tot_it - 1:
                     test_loss, test_acc = self.test_solver()
@@ -100,8 +100,8 @@ class ClsSolver(BasicSolver):
                         f' lr[{self.sche.get_lr()[0]:.4g}]'
                         f' rem-t[{remain_time}] ({finish_time})'
                     )
-                    self.tb_lg.add_scalar('test_loss', test_loss, it + tot_it * epoch)
-                    self.tb_lg.add_scalar('test_acc', test_acc, it + tot_it * epoch)
+                    self.tb_lg.add_scalar('cls_v_loss', test_loss, it + tot_it * epoch)
+                    self.tb_lg.add_scalar('cls_v_acc', test_acc, it + tot_it * epoch)
                 
                     is_best = test_acc > best_acc
                     best_acc = max(test_acc, best_acc)
@@ -128,8 +128,8 @@ class ClsSolver(BasicSolver):
                 }, model_ckpt_path)
                 self.lg.info(f'==> Saving cls model at epoch{epoch} complete.')
     
-        self.tb_lg.add_scalar('best_test_acc', best_acc, 0)
-        self.tb_lg.add_scalar('best_test_acc', best_acc, len(self.train_loader) * self.cfg.epochs)
+        self.tb_lg.add_scalar('cls_best_v_acc', best_acc, 0)
+        self.tb_lg.add_scalar('cls_best_v_acc', best_acc, len(self.train_loader) * self.cfg.epochs)
         self.lg.info(
             f'==> End training,'
             f' total time cost: {time.time() - start_train_t:.3f},'

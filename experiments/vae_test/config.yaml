@@ -18,7 +18,7 @@ vae:
     optm:
         name: adamw
         kwargs:
-            lr: 0.00075
+            lr: 0.001
 #            nesterov: True
 #            momentum: 0.9
             betas: !!python/tuple [0.5, 0.999]
