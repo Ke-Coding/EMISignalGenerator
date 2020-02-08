@@ -85,6 +85,8 @@ def main():
         pass
     else:
         cfg.vae.model.kwargs.input_size = args.sig_len
+        cfg.vae.model.kwargs.input_ch = cfg.input_ch
+        cfg.vae.model.kwargs.embedding_ch = cfg.embedding_ch
         vae_solver = VAESolver(
             train_loader=vae_train_loader,
             test_loader=vae_test_loader,
@@ -94,7 +96,8 @@ def main():
         )
         vae_solver.train_solver()
 
-        cfg.cls.model.kwargs.input_ch = cfg.vae.model.kwargs.embedding_ch
+        cfg.cls.model.kwargs.input_ch = cfg.input_ch
+        cfg.cls.model.kwargs.embedding_ch = cfg.embedding_ch
         cfg.cls.model.kwargs.num_classes = args.sig_classes
         cls_solver = ClsSolver(
             train_loader=cls_train_loader,

@@ -1,3 +1,6 @@
+input_ch: 1
+embedding_ch: 16
+
 vae:
     epochs: 32
     batch_size: 8
@@ -9,19 +12,17 @@ vae:
     model:
         name: CNNVAE
         kwargs:
-            embedding_ch: 16
-            input_ch: 1
             channels: [16, 32, 32, 32, 64, 64, 64, 64, 128, 128, 64, 64, 32, 32, 32]
             strides:  [2,  1,  1,  1,  2,  1,  1,  1,  2,   1,   1,  1,  1,  1,  1]
             af_name: swish
     optm:
         name: adamw
         kwargs:
-            lr: 0.00005
+            lr: 0.0005
 #            nesterov: True
 #            momentum: 0.9
             betas: !!python/tuple [0.5, 0.999]
-            weight_decay: 0.000001
+            weight_decay: 0.00001
         nowd: True
         nowd_dict:
             bn_b:
@@ -44,7 +45,6 @@ cls:
     model:
         name: CNNComb
         kwargs:
-            input_ch: 16
             channels: [32, 32, 64, 64, 64, 128, 128]
             strides:  [1,  1,  2,  1,  1,  1,   1]
             last_ch: 256

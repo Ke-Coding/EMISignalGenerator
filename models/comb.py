@@ -81,6 +81,7 @@ class CNNComb(nn.Module):
         self,
         encoder,
         input_ch,
+        embedding_ch,
         num_classes,
         channels,
         strides,
@@ -99,7 +100,7 @@ class CNNComb(nn.Module):
         self.input_ch = input_ch
         self.af = get_af(af_name=af_name)
         self.back_bone = self._make_backbone(
-            cins=[input_ch] + channels[:-1],
+            cins=[embedding_ch] + channels[:-1],
             couts=channels,
             strides=strides,
         )
