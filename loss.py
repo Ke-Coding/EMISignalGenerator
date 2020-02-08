@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 
 
 class LabelSmoothCELoss(torch.nn.Module):
@@ -17,3 +18,9 @@ class LabelSmoothCELoss(torch.nn.Module):
 
         loss = - torch.sum(self.logsoft(input) * (one_hot.detach())) / input.size(0)
         return loss
+
+
+def vae_loss(x, x_rec, mu, log_sigma):
+    bce_loss = 4 * F.binary_cross_entropy(x_rec, x, reduction='mean')
+    kld_loss = -0.5 * torch.mean(1 + log_sigma - mu*mu - log_sigma.exp())
+    return bce_loss, kld_loss

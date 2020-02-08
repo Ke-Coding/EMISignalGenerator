@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
-class EMIDataset(Dataset):
+class _EMIDataset(Dataset):
     def __init__(self, data_dir: str, train: bool, num_classes: int, normalize: bool):
         whole_set = pd.read_csv(data_dir, sep='\s+', header=None).values.astype(dtype=np.float32)
         data = {i: [] for i in range(num_classes)}
@@ -26,7 +26,7 @@ class EMIDataset(Dataset):
         
         if normalize:
             # scaler = StandardScaler()
-            scaler = MinMaxScaler(feature_range=(-1, 1))
+            scaler = MinMaxScaler(feature_range=(0, 1))
             train_sigs = scaler.fit_transform(train_sigs)
             test_sigs = scaler.transform(test_sigs)
         
@@ -34,23 +34,41 @@ class EMIDataset(Dataset):
         self.len = len(self.labels)
     
     def __getitem__(self, index):
-        # index %= self.len
-        signal, label = self.signals[index], self.labels[index]
-        return torch.from_numpy(signal), label
+        raise NotImplementedError
     
     def __len__(self):
         return self.len
 
 
+class LabeledEMIDataSet(_EMIDataset):
+    def __init__(self, data_dir: str, train: bool, num_classes: int, normalize: bool):
+        super(LabeledEMIDataSet, self).__init__(data_dir, train, num_classes, normalize)
+
+    def __getitem__(self, index):
+        # index %= self.len
+        signal, label = self.signals[index], self.labels[index]
+        return torch.from_numpy(signal), label
+
+
+class InLabeledEMIDataSet(_EMIDataset):
+    def __init__(self, data_dir: str, train: bool, num_classes: int, normalize: bool):
+        super(InLabeledEMIDataSet, self).__init__(data_dir, train, num_classes, normalize)
+
+    def __getitem__(self, index):
+        # index %= self.len
+        signal = self.signals[index]
+        return torch.from_numpy(signal), torch.from_numpy(signal)
+
+
 if __name__ == '__main__':
-    train_set = EMIDataset(
+    train_set = LabeledEMIDataSet(
         data_dir='../emi_sig/data.txt',
         train=True,
         num_classes=5,
         normalize=True
     )
     print(train_set[0])
-    test_set = EMIDataset(
+    test_set = LabeledEMIDataSet(
         data_dir='../emi_sig/data.txt',
         train=False,
         num_classes=5,

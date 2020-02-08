@@ -35,6 +35,7 @@ python -u -m main \
 --data_dir=${DS_FILE} \
 --num_gpu=1 \
 --seed=0 \
---input_size=${SIG_LEN} \
---num_classes=5 \
+--sig_len=${SIG_LEN} \
+--sig_classes=5 \
 #--load_dir= \
+#--only_val \

@@ -9,6 +9,10 @@ import numpy as np
 from collections import defaultdict
 
 
+def refine_str(s):
+    return s.strip().lower()
+
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 
@@ -158,29 +162,21 @@ def create_logger(name, log_file, level=logging.INFO, stream=True):
     return l
 
 
+# the params whose requires_grad=False will be omitted
 def param_group_all(model, nowd_dict):
     pgroup_normal = []
     pgroup = {'bn_w': [], 'bn_b': [], 'conv_b': [], 'linear_b': []}
     names = {'bn_w': [], 'bn_b': [], 'conv_b': [], 'linear_b': []}
-    if 'conv_dw_w' in nowd_dict:
-        pgroup['conv_dw_w'] = []
-        names['conv_dw_w'] = []
-    if 'conv_dw_b' in nowd_dict:
-        pgroup['conv_dw_b'] = []
-        names['conv_dw_b'] = []
-    if 'conv_dense_w' in nowd_dict:
-        pgroup['conv_dense_w'] = []
-        names['conv_dense_w'] = []
-    if 'conv_dense_b' in nowd_dict:
-        pgroup['conv_dense_b'] = []
-        names['conv_dense_b'] = []
-    if 'linear_w' in nowd_dict:
-        pgroup['linear_w'] = []
-        names['linear_w'] = []
+    
+    for k in ['conv_dw_w', 'conv_dw_b', 'conv_dense_w', 'conv_dense_b', 'linear_w']:
+        if k in nowd_dict:
+            pgroup[k], names[k] = [], []
 
     names_all = []
     type2num = defaultdict(lambda: 0)
     for name, m in model.named_modules():
+        if hasattr(m, 'requires_grad') and not m.requires_grad:
+            continue
         if isinstance(m, torch.nn.Conv2d):
             if m.bias is not None:
                 if 'conv_dw_b' in pgroup and m.groups == m.in_channels:
@@ -235,7 +231,7 @@ def param_group_all(model, nowd_dict):
                 type2num[m.__class__.__name__+'.bias'] += 1
 
     for name, p in model.named_parameters():
-        if name not in names_all:
+        if name not in names_all and p.requires_grad:
             pgroup_normal.append(p)
 
     param_groups = [{'params': pgroup_normal}]
@@ -304,10 +300,11 @@ def hsigmoid(x, inplace=False):
 
 
 def get_af(af_name):
-    af_name = af_name.strip().lower()
+    af_name = refine_str(af_name)
     af_dic = {
-        # 'sigmoid' : F.sigmoid,
-        # 'hsigmoid': hsigmoid,
+        'sigmoid' : F.sigmoid,
+        'hsigmoid': hsigmoid,
+        'tanh': F.tanh,
         'relu': F.relu,
         'relu6': F.relu6,
         'swish': swish,

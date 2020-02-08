@@ -127,8 +127,8 @@ class CosineLRScheduler(_WarmUpLRScheduler):
 
 
 class ConstScheduler(object):
-    def __init__(self, lr):
-        self.lr = lr
+    def __init__(self, base_lr, **kwargs):
+        self.lr = base_lr
     
     def step(self):
         return
