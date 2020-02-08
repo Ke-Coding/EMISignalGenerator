@@ -108,6 +108,7 @@ class CNNComb(nn.Module):
             nn.BatchNorm1d(last_ch)
         )
         
+        self.using_dropout = dropout_p is not None and abs(dropout_p) > 1e-6
         if self.using_dropout:
             self.dropout = nn.Dropout(p=dropout_p, inplace=True)
         self.classifier = nn.Linear(last_ch, num_classes)
