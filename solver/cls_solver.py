@@ -25,6 +25,10 @@ class ClsSolver(BasicSolver):
         with torch.no_grad():
             tot_loss, tot_pred, tot_correct, tot_it = 0., 0, 0, len(self.test_loader)
             for it, (inputs, targets) in enumerate(self.test_loader):
+                if it == 0:
+                    for p in self.net.encoder.parameters():
+                        print(p)
+                        break
                 if self.cfg.using_gpu:
                     inputs, targets = inputs.cuda(), targets.cuda()
                 outputs = self.net(inputs)
