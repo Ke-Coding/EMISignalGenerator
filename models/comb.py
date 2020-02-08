@@ -129,16 +129,12 @@ class CNNComb(nn.Module):
     def forward(self, x):
         x = x.view(x.shape[0], self.input_ch, -1)
         gaussian, _, _ = self.encoder(x)
-        print('gp', gaussian.shape)
         feature = self.back_bone(gaussian)
-        print('f1', feature.shape)
         feature = self.af(self.last_conv(feature), inplace=True)
-        print('f2', feature.shape)
-        feature = feature.mean(dim=[1, 2])
+        feature = feature.mean(dim=[2])
         if self.using_dropout:
             feature = self.dropout(feature)
         feature = feature.view(feature.shape[0], -1)
-        print('f3', feature.shape)
         logits = self.classifier(feature)
         return logits
 
