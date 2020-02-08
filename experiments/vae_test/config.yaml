@@ -2,7 +2,7 @@ input_ch: 1
 embedding_ch: 16
 
 vae:
-    epochs: 32
+    epochs: 100
     batch_size: 8
     grad_clip: 5.0
     tb_lg_freq: 8
@@ -53,7 +53,7 @@ cls:
     optm:
         name: adamw
         kwargs:
-            lr: 0.001
+            lr: 0.01
 #            nesterov: True
 #            momentum: 0.9
             betas: !!python/tuple [0.5, 0.999]

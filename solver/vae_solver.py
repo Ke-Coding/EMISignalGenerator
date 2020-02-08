@@ -26,11 +26,11 @@ class VAESolver(BasicSolver):
             for it, (inputs, _) in enumerate(self.test_loader):
                 if self.cfg.using_gpu:
                     inputs = inputs.cuda()
-                if it == 0:
-                    gaussian, mu, log_sigma = self.net.encoder(inputs.view(inputs.shape[0], 1, -1))
-                    print('mu : ', mu[0][0:1])
-                    print('sgm: ', log_sigma[0][0:1])
-                    print('gau: ', gaussian[0][0:1])
+                # if it == 0:
+                #     gaussian, mu, log_sigma = self.net.encoder(inputs.view(inputs.shape[0], 1, -1))
+                #     print('mu : ', mu[0][0:1])
+                #     print('sgm: ', log_sigma[0][0:1])
+                #     print('gau: ', gaussian[0][0:1])
                 x_rec, mu, log_sigma = self.net(inputs)
                 bce_loss, kld_loss = vae_loss(inputs, x_rec, mu, log_sigma)
                 loss = bce_loss + kld_loss
