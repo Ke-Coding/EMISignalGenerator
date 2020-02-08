@@ -28,7 +28,7 @@ class VAESolver(BasicSolver):
                     inputs = inputs.cuda()
                 x_rec, mu, log_sigma = self.net(inputs)
                 bce_loss, kld_loss = vae_loss(inputs, x_rec, mu, log_sigma)
-                loss = bce_loss + kld_loss
+                loss = bce_loss #+ kld_loss
                 tot_loss += loss.item()
                 tot_bce += bce_loss.item()
                 tot_kld += kld_loss.item()
@@ -59,7 +59,7 @@ class VAESolver(BasicSolver):
                 self.optm.zero_grad()
                 x_rec, mu, log_sigma = self.net(inputs)
                 bce_loss, kld_loss = vae_loss(inputs, x_rec, mu, log_sigma)
-                loss = bce_loss + kld_loss
+                loss = bce_loss #+ kld_loss
                 loss.backward()
                 train_loss_avg.update(loss.item())
                 train_bce_avg.update(bce_loss.item())
