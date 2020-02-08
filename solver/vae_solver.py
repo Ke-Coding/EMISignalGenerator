@@ -28,9 +28,9 @@ class VAESolver(BasicSolver):
                     inputs = inputs.cuda()
                 if it == 0:
                     gaussian, mu, log_sigma = self.net.encoder(inputs.view(inputs.shape[0], 1, -1))
-                    print('mu : ', mu)
-                    print('sgm: ', log_sigma)
-                    print('gau: ', gaussian)
+                    print('mu : ', mu[0][0:1])
+                    print('sgm: ', log_sigma[0][0:1])
+                    print('gau: ', gaussian[0][0:1])
                 x_rec, mu, log_sigma = self.net(inputs)
                 bce_loss, kld_loss = vae_loss(inputs, x_rec, mu, log_sigma)
                 loss = bce_loss + kld_loss
