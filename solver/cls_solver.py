@@ -25,7 +25,7 @@ class ClsSolver(BasicSolver):
         with torch.no_grad():
             tot_loss, tot_pred, tot_correct, tot_it = 0., 0, 0, len(self.test_loader)
             for it, (inputs, targets) in enumerate(self.test_loader):
-                if it == 0:
+                # if it == 0:
                     # cnt = 0
                     # for n, p in self.net.encoder.named_parameters():
                     #     print(n, p)
